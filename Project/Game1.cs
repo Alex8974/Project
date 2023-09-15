@@ -3,6 +3,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using CollisionExample.Collisions;
+using System.Collections;
+using System;
 //using System.Windows.Forms;
 
 namespace Project
@@ -47,18 +49,45 @@ namespace Project
             keyboardState = Keyboard.GetState();
             // TODO: Add your update logic here
 
-            foreach(Person p in Team1)
+            for(int i = 0; i < Team1.Count; i++)
+            //foreach(Person p in Team1)
             {
+                var p = Team1[i];
                 foreach(Person p1 in Team2)
                 {
                     if(CollisionHelper.Collides(p.Bounds, p1.Bounds) && p.IsAlive && p1.IsAlive)
                     {
                         p.Speed = 0;
                         p1.Speed = 0;
+
+                        p1.Attack(p);
+                        p.Attack(p1);
+
+                        if(p.Health <= 0)
+                        {
+                            p.IsAlive = false;
+                        }
+                        if(p1.Health <= 0)
+                        {
+                            p1.IsAlive = false;
+                        }
+
                     }
-                    
+                }
+                for(int j = i + 1; j < Team1.Count; j++)
+                {
+                    if (CollisionHelper.Collides(p.Bounds, Team1[j].Bounds))
+                    {
+                        //p.Speed = 0;
+                        Team1[j].Speed = 0;
+                        Team1[j].frameRow = SpriteSheetPicker.StandingRight;
+                    }
                 }
             }
+
+
+
+
 
             if (keyboardState.IsKeyDown(Keys.A) && !prevkeyboardState.IsKeyDown(Keys.A))
             {
@@ -68,6 +97,16 @@ namespace Project
             if (keyboardState.IsKeyDown(Keys.S) && !prevkeyboardState.IsKeyDown(Keys.S))
             {
                 Team2.Add(new SwordsMan(Content, "Team2"));
+            }
+
+            if (keyboardState.IsKeyDown(Keys.Q) && !prevkeyboardState.IsKeyDown(Keys.Q))
+            {
+                Team1.Add(new Archer(Content, "Team1"));
+            }
+
+            if (keyboardState.IsKeyDown(Keys.W) && !prevkeyboardState.IsKeyDown(Keys.W))
+            {
+                Team2.Add(new Archer(Content, "Team2"));
             }
 
 
@@ -82,8 +121,8 @@ namespace Project
 
             _spriteBatch.Begin();
             // TODO: Add your drawing code here
-            foreach (Person p in Team1) p.Draw(_spriteBatch);
-            foreach (Person p in Team2) p.Draw(_spriteBatch);
+            foreach (Person p in Team1) p.Draw(_spriteBatch, gameTime);
+            foreach (Person p in Team2) p.Draw(_spriteBatch, gameTime);
 
             _spriteBatch.End();
             base.Draw(gameTime);

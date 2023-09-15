@@ -12,6 +12,7 @@ using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Content;
 using CollisionExample.Collisions;
+//using SharpDX.Direct2D1;
 
 namespace Project
 {
@@ -20,43 +21,32 @@ namespace Project
         //the texture
         public Texture2D texture;
 
-        // the team that the person is on
-        private int team;
-
-        //the size of the sprite 
-        private int size = 50;
-
-        /// <summary>
-        /// the position from the top left cornner
-        /// </summary>
         public override Vector2 Position { get; set; }
 
-        /// <summary>
-        /// the health of the person
-        /// </summary>
         public override int Health { get; set; } = 8;
 
-        /// <summary>
-        /// the speed of the person
-        /// </summary>
         public override int Speed { get; set; } = 30;
         public override int Damage { get; set; } = 4;
         public override int Armor { get; } = 2;
+        public override double AttackCoolDown { get; set; } = 0;
+
 
         public override bool IsAlive { get; set; } = true;
 
+
         private BoundingRectangle bounds;
-        public override BoundingRectangle Bounds { 
-            get 
-            {
-                return bounds;
-            } 
-        }
+        /// <summary>
+        /// the collision rectangle
+        /// </summary>
+        public override BoundingRectangle Bounds { get { return bounds; } }
+
 
         public SwordsMan(ContentManager c, string Team)
         {
-            texture = c.Load<Texture2D>("Penguin2");
-            
+            if(Team == "Team1") texture = c.Load<Texture2D>("Team1Knight");
+            if (Team == "Team2") texture = c.Load<Texture2D>("Team2Knight");
+
+
 
             if (Team == "Team1")
             {
@@ -73,27 +63,62 @@ namespace Project
             bounds = new BoundingRectangle(Position, size, size);
         }
 
-        public override void Move(GameTime gT)
+        public override void Attack(Person other)
         {
-            Position += (new Vector2(Speed, 0) * (float)gT.ElapsedGameTime.TotalSeconds * team);
+            if(AttackCoolDown > 0.5)
+            {
+                frameRow = SpriteSheetPicker.BowRight;
+                other.Health -= (this.Damage - other.Armor);
+                AttackCoolDown = 0;
+            }
         }
 
         public override void Update(GameTime gT)
         {
+            this.AttackCoolDown += gT.ElapsedGameTime.TotalSeconds;
             bounds.X = Position.X;
-            bounds.Y = Position.Y;
+            bounds.Y = Position.Y;      
             
-
+            if(Speed > 0) { Move(gT); }
             
-            Move(gT);
 
             Speed = 30;
 
         }
 
-        public override void Draw(SpriteBatch s)
+        public override void Draw(SpriteBatch s, GameTime gT)
         {
-            if(this.IsAlive) s.Draw(texture, Position, Color.White);
+            Rectangle source = new Rectangle(animationFrame * 16 , (int)frameRow * 16, 16, 16);
+            animationTimer += gT.ElapsedGameTime.TotalSeconds;
+
+            if((int)frameRow > 3)
+            {
+                if (animationTimer > ANIMATION_TIMER)
+                {
+                    if (animationFrame < 3)
+                    {
+                        animationFrame++;
+                    }
+                    else
+                    {
+                        animationFrame = 0;
+                    }
+                    animationTimer = 0;
+                }
+            }
+            else
+            {
+                source = new Rectangle(0, (int)frameRow * 16, 16, 16);
+            }
+
+            
+
+            if (this.IsAlive)
+            {
+                if(team == 1) s.Draw(texture, Position, source ,Color.White, 0 , new Vector2(0,0), 2f, SpriteEffects.None, 0);
+                if(team == -1) s.Draw(texture, Position, source ,Color.White, 0 , new Vector2(0,0), 2f, SpriteEffects.FlipHorizontally, 0);
+      //spriteBatch.Draw(texture, position, null, Color, 0, new Vector2(64, 64), 0.25f, spriteEffects, 0);
+            }
         }
     }
 }
