@@ -14,8 +14,9 @@ namespace Project
 {
     public class Archer : Person
     {
-        private int team;
         private Texture2D texture;
+
+        public List<Arrow> arrows = new List<Arrow>();
         
         public override int Health { get; set; } = 8;
         public override int Speed { get; set; } = 20;
@@ -33,9 +34,8 @@ namespace Project
 
         public Archer(ContentManager c, string Team)
         {
-            if (Team == "Team1") texture = c.Load<Texture2D>("Team1Knight");
-            if (Team == "Team2") texture = c.Load<Texture2D>("Team2Knight");
-
+            if (Team == "Team1") texture = c.Load<Texture2D>("Team1KnightAllWalkingAnimations");
+            if (Team == "Team2") texture = c.Load<Texture2D>("Team2KnightAllanimaitons");
 
 
             if (Team == "Team1")
@@ -52,13 +52,34 @@ namespace Project
             bounds = new BoundingRectangle(Position, size, size);
         }
 
+        public override void CheckForAttack(List<Person> otherp)
+        {
+            Person holdp = null;
+            bool hold = false;
+            int i = 0;
+            while (i < 10 && hold == false)
+            {
+                bounds.X += (i * 10);
+                foreach(var p in otherp)
+                {
+                    hold = CollisionHelper.Collides(this.Bounds, p.Bounds);
+                    holdp = p;
+                }
+                i++;
+                bounds.X = Position.X;
+            }
+            if(hold == true)
+            {
+                Attack(holdp);
+            }
+        }
+
         public override void Attack(Person other)
         {
-            if (AttackCoolDown > 0.5)
+            if (AttackCoolDown > 1.0)
             {
-                frameRow = SpriteSheetPicker.BowRight;
-                other.Health -= (this.Damage - other.Armor);
-                AttackCoolDown = 0;
+                if(team == 1) arrows.Add(new Arrow(Position + new Vector2(16,0)));
+                if(team == 2) arrows.Add(new Arrow(Position));
             }
         }
 
@@ -68,7 +89,11 @@ namespace Project
             bounds.X = Position.X;
             bounds.Y = Position.Y;
 
-            if (Speed > 0) { Move(gT); }
+            if (Speed > 0) 
+            { 
+                Move(gT);
+                frameRow = SpriteSheetPicker.WalkingRighBow;
+            }
 
 
             Speed = 20;

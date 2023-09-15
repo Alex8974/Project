@@ -43,8 +43,8 @@ namespace Project
 
         public SwordsMan(ContentManager c, string Team)
         {
-            if(Team == "Team1") texture = c.Load<Texture2D>("Team1Knight");
-            if (Team == "Team2") texture = c.Load<Texture2D>("Team2Knight");
+            if(Team == "Team1") texture = c.Load<Texture2D>("Team1KnightAllWalkingAnimations");
+            if (Team == "Team2") texture = c.Load<Texture2D>("Team2KnightAllanimaitons");
 
 
 
@@ -63,11 +63,25 @@ namespace Project
             bounds = new BoundingRectangle(Position, size, size);
         }
 
-        public override void Attack(Person other)
+        public override void CheckForAttack(List<Person> otherp)
         {
+            bool hold = false;
+            int i = 0;
+            foreach(var p in otherp)
+            {
+                hold = CollisionHelper.Collides(this.Bounds, otherp[i].Bounds);
+            }
+            if (hold == true)
+            {
+                Attack(otherp[i]);
+            }
+        }
+
+        public override void Attack(Person other)
+        {            
             if(AttackCoolDown > 0.5)
             {
-                frameRow = SpriteSheetPicker.BowRight;
+                frameRow = SpriteSheetPicker.SwordRight;
                 other.Health -= (this.Damage - other.Armor);
                 AttackCoolDown = 0;
             }
@@ -117,7 +131,6 @@ namespace Project
             {
                 if(team == 1) s.Draw(texture, Position, source ,Color.White, 0 , new Vector2(0,0), 2f, SpriteEffects.None, 0);
                 if(team == -1) s.Draw(texture, Position, source ,Color.White, 0 , new Vector2(0,0), 2f, SpriteEffects.FlipHorizontally, 0);
-      //spriteBatch.Draw(texture, position, null, Color, 0, new Vector2(64, 64), 0.25f, spriteEffects, 0);
             }
         }
     }

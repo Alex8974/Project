@@ -76,6 +76,9 @@ namespace Project
         /// <param name="other">the person beign attacked</param>
         public abstract void Attack(Person other);
 
+
+        public abstract void CheckForAttack(List<Person> otherp);
+
         /// <summary>
         /// updates the person 
         /// </summary>

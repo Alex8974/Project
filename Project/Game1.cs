@@ -55,6 +55,7 @@ namespace Project
                 var p = Team1[i];
                 foreach(Person p1 in Team2)
                 {
+                    Team1[i].CheckForAttack(Team2);
                     if(CollisionHelper.Collides(p.Bounds, p1.Bounds) && p.IsAlive && p1.IsAlive)
                     {
                         p.Speed = 0;
@@ -71,7 +72,6 @@ namespace Project
                         {
                             p1.IsAlive = false;
                         }
-
                     }
                 }
                 for(int j = i + 1; j < Team1.Count; j++)
