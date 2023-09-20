@@ -17,7 +17,8 @@ namespace Project
         private Texture2D texture;
 
         public List<Arrow> arrows = new List<Arrow>();
-        
+
+        private ContentManager cm;
         public override int Health { get; set; } = 8;
         public override int Speed { get; set; } = 20;
         public override int Damage { get; set; } = 3;
@@ -50,6 +51,7 @@ namespace Project
             }
             else throw new Exception($"bad team name: {Team}");
             bounds = new BoundingRectangle(Position, size, size);
+            cm = c;
         }
 
         public override void CheckForAttack(List<Person> otherp)
@@ -81,8 +83,8 @@ namespace Project
         {
             if (AttackCoolDown > 1.0)
             {
-                if(team == 1) arrows.Add(new Arrow(Position + new Vector2(16,0)));
-                if(team == 2) arrows.Add(new Arrow(Position));
+                if(team == 1) arrows.Add(new Arrow(Position + new Vector2(16,0), cm));
+                if(team == 2) arrows.Add(new Arrow(Position, cm));
             }
         }
 
