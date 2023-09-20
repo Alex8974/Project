@@ -65,16 +65,16 @@ namespace Project
 
         public override void CheckForAttack(List<Person> otherp)
         {
-            bool hold = false;
-            int i = 0;
-            foreach(var p in otherp)
+ 
+            for(int i = 0; i < otherp.Count; i++)
             {
-                hold = CollisionHelper.Collides(this.Bounds, otherp[i].Bounds);
+                if( CollisionHelper.Collides(this.Bounds, otherp[i].Bounds) && this.IsAlive && otherp[i].IsAlive)
+                {
+                    Speed = 0;
+                    Attack(otherp[i]);
+                }
             }
-            if (hold == true)
-            {
-                Attack(otherp[i]);
-            }
+
         }
 
         public override void Attack(Person other)
@@ -89,6 +89,8 @@ namespace Project
 
         public override void Update(GameTime gT)
         {
+            if (this.Health <= 0) this.IsAlive = false;
+
             this.AttackCoolDown += gT.ElapsedGameTime.TotalSeconds;
             bounds.X = Position.X;
             bounds.Y = Position.Y;      

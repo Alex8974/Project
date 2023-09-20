@@ -59,7 +59,9 @@ namespace Project
             int i = 0;
             while (i < 10 && hold == false)
             {
-                bounds.X += (i * 10);
+                if (team == 1) bounds.X += (i * 10);
+                else if (team == -1) bounds.X -= (i * 10);
+                
                 foreach(var p in otherp)
                 {
                     hold = CollisionHelper.Collides(this.Bounds, p.Bounds);
@@ -71,6 +73,7 @@ namespace Project
             if(hold == true)
             {
                 Attack(holdp);
+                Speed = 0;
             }
         }
 

@@ -17,7 +17,7 @@ namespace Project
         public SpriteSheetPicker frameRow = SpriteSheetPicker.WalkingRight;
         protected int animationFrame = 0;
         protected double animationTimer;
-
+        protected bool attacking;
         public int team { get; set; }
 
         /// <summary>

@@ -17,6 +17,8 @@ namespace Project
 
         public int Speed = 40;
 
+        public BoundingRectangle bounds;
+
         public Arrow(Vector2 shotFrom)
         {
             ShotFrom = shotFrom;
