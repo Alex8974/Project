@@ -25,6 +25,13 @@
 /processorParam:TextureFormat=Color
 /build:ArrowBlue.png
 
+#begin bangers.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:bangers.spritefont
+
 #begin Penguin2.png
 /importer:TextureImporter
 /processor:TextureProcessor

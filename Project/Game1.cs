@@ -17,7 +17,8 @@ namespace Project
         private SpriteBatch _spriteBatch;
         private KeyboardState keyboardState;
         private KeyboardState prevkeyboardState;
-        public GameStates gameStates = GameStates.Start;
+        private GameStates gameStates = GameStates.Start;
+        private SpriteFont font;
 
         private List<Person> Team1 = new List<Person>();
         private List<Person> Team2 = new List<Person>();
@@ -54,6 +55,7 @@ namespace Project
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
+            font = Content.Load<SpriteFont>("bangers");
             base.Initialize();
         }
 
@@ -196,11 +198,22 @@ namespace Project
 
             _spriteBatch.Begin();
             // TODO: Add your drawing code here
+            if(gameStates == GameStates.Start)
+            {
+                _spriteBatch.DrawString(font, "Castle Crusaders", new Vector2(250, 150), Color.Black);
+                _spriteBatch.DrawString(font, "Press 'Enter' to start", new Vector2(300, 200), Color.Black, 0, new Vector2(0,0), 0.5f, SpriteEffects.None, 0);
+            }
             if(gameStates == GameStates.Running)
             {
+                if (gameStates == GameStates.Pause)
+                {
+
+                }
                 foreach (Person p in Team1) p.Draw(_spriteBatch, gameTime);
                 foreach (Person p in Team2) p.Draw(_spriteBatch, gameTime);
             }
+
+            
 
             
 
