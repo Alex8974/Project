@@ -17,6 +17,7 @@ namespace Project
         private SpriteBatch _spriteBatch;
         private KeyboardState keyboardState;
         private KeyboardState prevkeyboardState;
+        public GameStates gameStates = GameStates.Start;
 
         private List<Person> Team1 = new List<Person>();
         private List<Person> Team2 = new List<Person>();
@@ -71,104 +72,121 @@ namespace Project
             prevkeyboardState = keyboardState;
             keyboardState = Keyboard.GetState();
             // TODO: Add your update logic here
-            #region new attack 
 
-            for( int i = 0; i < Math.Max(Team1.Count, Team2.Count); i++)
+            if(gameStates == GameStates.Start)
             {
-                //check attacks for team 1
-                if(i < Team1.Count)
+                if (keyboardState.IsKeyDown(Keys.Enter))
                 {
-                    Team1[i].CheckForAttack(Team2);
-                    for (int j = i + 1; j < Team1.Count; j++)
+                    gameStates = GameStates.Running;
+                }
+            }
+
+            if (gameStates == GameStates.Running)
+            {
+                #region new attack 
+
+                for (int i = 0; i < Math.Max(Team1.Count, Team2.Count); i++)
+                {
+                    //check attacks for team 1
+                    if (i < Team1.Count)
                     {
-                        if (CollisionHelper.Collides(Team1[i].Bounds, Team1[j].Bounds))
+                        Team1[i].CheckForAttack(Team2);
+                        for (int j = i + 1; j < Team1.Count; j++)
                         {
-                            //p.Speed = 0;
-                            Team1[j].Speed = 0;
-                            Team1[j].frameRow = SpriteSheetPicker.StandingRight;
+                            if (CollisionHelper.Collides(Team1[i].Bounds, Team1[j].Bounds))
+                            {
+                                //p.Speed = 0;
+                                Team1[j].Speed = 0;
+                                Team1[j].frameRow = SpriteSheetPicker.StandingRight;
+                            }
+                        }
+                    }
+                    //check attacks for team 2
+                    if (i < Team2.Count)
+                    {
+                        Team2[i].CheckForAttack(Team1);
+                        for (int j = i + 1; j < Team2.Count; j++)
+                        {
+                            if (CollisionHelper.Collides(Team2[i].Bounds, Team2[j].Bounds))
+                            {
+                                //p.Speed = 0;
+                                Team2[j].Speed = 0;
+                                Team2[j].frameRow = SpriteSheetPicker.StandingRight;
+                            }
                         }
                     }
                 }
-                //check attacks for team 2
-                if(i < Team2.Count)
+                #endregion
+
+                #region old attack 
+                //for (int i = 0; i < Team1.Count; i++)
+                //    foreach (Person p in Team1)
+                //    {
+                //        var p = Team1[i];
+                //        foreach (Person p1 in Team2)
+                //        {
+                //            Team1[i].CheckForAttack(Team2);
+                //            if (CollisionHelper.Collides(p.Bounds, p1.Bounds) && p.IsAlive && p1.IsAlive)
+                //            {
+                //                p.Speed = 0;
+                //                p1.Speed = 0;
+
+                //                p1.Attack(p);
+                //                p.Attack(p1);
+
+                //                if (p.Health <= 0)
+                //                {
+                //                    p.IsAlive = false;
+                //                }
+                //                if (p1.Health <= 0)
+                //                {
+                //                    p1.IsAlive = false;
+                //                }
+                //            }
+                //        }
+                //        for (int j = i + 1; j < Team1.Count; j++)
+                //        {
+                //            if (CollisionHelper.Collides(p.Bounds, Team1[j].Bounds))
+                //            {
+                //                //p.Speed = 0;
+                //                Team1[j].Speed = 0;
+                //                Team1[j].frameRow = SpriteSheetPicker.StandingRight;
+                //            }
+                //        }
+                //    }
+
+                #endregion
+
+                #region Keys for summon
+
+                if (keyboardState.IsKeyDown(Keys.A) && !prevkeyboardState.IsKeyDown(Keys.A))
                 {
-                    Team2[i].CheckForAttack(Team1);
-                    for (int j = i + 1; j < Team2.Count; j++)
-                    {
-                        if (CollisionHelper.Collides(Team2[i].Bounds, Team2[j].Bounds))
-                        {
-                            //p.Speed = 0;
-                            Team2[j].Speed = 0;
-                            Team2[j].frameRow = SpriteSheetPicker.StandingRight;
-                        }
-                    }
+                    Team1.Add(new SwordsMan(Content, "Team1"));
                 }
-            }
-            #endregion
 
-            #region old attack 
-            //for (int i = 0; i < Team1.Count; i++)
-            //    foreach (Person p in Team1)
-            //    {
-            //        var p = Team1[i];
-            //        foreach (Person p1 in Team2)
-            //        {
-            //            Team1[i].CheckForAttack(Team2);
-            //            if (CollisionHelper.Collides(p.Bounds, p1.Bounds) && p.IsAlive && p1.IsAlive)
-            //            {
-            //                p.Speed = 0;
-            //                p1.Speed = 0;
+                if (keyboardState.IsKeyDown(Keys.S) && !prevkeyboardState.IsKeyDown(Keys.S))
+                {
+                    Team2.Add(new SwordsMan(Content, "Team2"));
+                }
 
-            //                p1.Attack(p);
-            //                p.Attack(p1);
+                if (keyboardState.IsKeyDown(Keys.Q) && !prevkeyboardState.IsKeyDown(Keys.Q))
+                {
+                    Team1.Add(new Archer(Content, "Team1"));
+                }
 
-            //                if (p.Health <= 0)
-            //                {
-            //                    p.IsAlive = false;
-            //                }
-            //                if (p1.Health <= 0)
-            //                {
-            //                    p1.IsAlive = false;
-            //                }
-            //            }
-            //        }
-            //        for (int j = i + 1; j < Team1.Count; j++)
-            //        {
-            //            if (CollisionHelper.Collides(p.Bounds, Team1[j].Bounds))
-            //            {
-            //                //p.Speed = 0;
-            //                Team1[j].Speed = 0;
-            //                Team1[j].frameRow = SpriteSheetPicker.StandingRight;
-            //            }
-            //        }
-            //    }
+                if (keyboardState.IsKeyDown(Keys.W) && !prevkeyboardState.IsKeyDown(Keys.W))
+                {
+                    Team2.Add(new Archer(Content, "Team2"));
+                }
 
-            #endregion
+                #endregion
 
+                foreach (Person p in Team1) p.Update(gameTime);
+                foreach (Person p in Team2) p.Update(gameTime);
 
-            if (keyboardState.IsKeyDown(Keys.A) && !prevkeyboardState.IsKeyDown(Keys.A))
-            {
-                Team1.Add(new SwordsMan(Content, "Team1"));
-            }
-
-            if (keyboardState.IsKeyDown(Keys.S) && !prevkeyboardState.IsKeyDown(Keys.S))
-            {
-                Team2.Add(new SwordsMan(Content, "Team2"));
-            }
-
-            if (keyboardState.IsKeyDown(Keys.Q) && !prevkeyboardState.IsKeyDown(Keys.Q))
-            {
-                Team1.Add(new Archer(Content, "Team1"));
-            }
-
-            if (keyboardState.IsKeyDown(Keys.W) && !prevkeyboardState.IsKeyDown(Keys.W))
-            {
-                Team2.Add(new Archer(Content, "Team2"));
             }
 
 
-            foreach (Person p in Team1) p.Update(gameTime);
-            foreach (Person p in Team2) p.Update(gameTime);
             base.Update(gameTime);
         }
 
@@ -178,8 +196,13 @@ namespace Project
 
             _spriteBatch.Begin();
             // TODO: Add your drawing code here
-            foreach (Person p in Team1) p.Draw(_spriteBatch, gameTime);
-            foreach (Person p in Team2) p.Draw(_spriteBatch, gameTime);
+            if(gameStates == GameStates.Running)
+            {
+                foreach (Person p in Team1) p.Draw(_spriteBatch, gameTime);
+                foreach (Person p in Team2) p.Draw(_spriteBatch, gameTime);
+            }
+
+            
 
             _spriteBatch.End();
             base.Draw(gameTime);
