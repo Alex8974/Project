@@ -7,6 +7,7 @@ using System.Collections;
 using System;
 using nkast.Aether.Physics2D.Dynamics;
 using Microsoft.VisualBasic;
+using System.Xml.Schema;
 //using System.Windows.Forms;
 
 namespace Project
@@ -19,6 +20,7 @@ namespace Project
         private KeyboardState prevkeyboardState;
         private GameStates gameStates = GameStates.Start;
         private SpriteFont font;
+        private double totalPauseTime = 0;
 
         private List<Person> Team1 = new List<Person>();
         private List<Person> Team2 = new List<Person>();
@@ -82,9 +84,16 @@ namespace Project
                     gameStates = GameStates.Running;
                 }
             }
-
-            if (gameStates == GameStates.Running)
+            else
             {
+                if (gameStates == GameStates.Pause)
+                {
+                    totalPauseTime += gameTime.ElapsedGameTime.TotalSeconds;
+
+                }
+
+                if (gameStates == GameStates.Running)
+                {
                 #region new attack 
 
                 for (int i = 0; i < Math.Max(Team1.Count, Team2.Count); i++)
@@ -186,7 +195,17 @@ namespace Project
                 foreach (Person p in Team1) p.Update(gameTime);
                 foreach (Person p in Team2) p.Update(gameTime);
 
+
+
+                }
+                if (keyboardState.IsKeyDown(Keys.P) && !prevkeyboardState.IsKeyDown(Keys.P))
+                {
+                    if (gameStates == GameStates.Pause) gameStates = GameStates.Running;
+                    else if (gameStates == GameStates.Running) gameStates = GameStates.Pause;
+                }
             }
+            
+            
 
 
             base.Update(gameTime);
@@ -194,6 +213,7 @@ namespace Project
 
         protected override void Draw(GameTime gameTime)
         {
+            
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             _spriteBatch.Begin();
@@ -203,11 +223,11 @@ namespace Project
                 _spriteBatch.DrawString(font, "Castle Crusaders", new Vector2(250, 150), Color.Black);
                 _spriteBatch.DrawString(font, "Press 'Enter' to start", new Vector2(300, 200), Color.Black, 0, new Vector2(0,0), 0.5f, SpriteEffects.None, 0);
             }
-            if(gameStates == GameStates.Running)
+            if(gameStates == GameStates.Running || gameStates == GameStates.Pause)
             {
                 if (gameStates == GameStates.Pause)
                 {
-
+                    _spriteBatch.DrawString(font, "Game Paused", new Vector2(250, 150), Color.Black);
                 }
                 foreach (Person p in Team1) p.Draw(_spriteBatch, gameTime);
                 foreach (Person p in Team2) p.Draw(_spriteBatch, gameTime);
