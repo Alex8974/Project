@@ -8,6 +8,7 @@ using System;
 using nkast.Aether.Physics2D.Dynamics;
 using Microsoft.VisualBasic;
 using System.Xml.Schema;
+using Microsoft.Xna.Framework.Media;
 //using System.Windows.Forms;
 
 namespace Project
@@ -21,6 +22,8 @@ namespace Project
         private GameStates gameStates = GameStates.Start;
         private SpriteFont font;
         private double totalPauseTime = 0;
+        SongCollection songCollection;
+
 
         private List<Person> Team1 = new List<Person>();
         private List<Person> Team2 = new List<Person>();
@@ -51,13 +54,19 @@ namespace Project
                 edge.BodyType = BodyType.Static;
                 edge.SetRestitution(1.0f);
             }
-
         }
 
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
             font = Content.Load<SpriteFont>("bangers");
+            Song song1 = Content.Load<Song>("mysong");
+            Song song2 = Content.Load<Song>("mysong2");
+            songCollection.Add(song1);
+            songCollection.Add(song2);
+
+
+            MediaPlayer.Play(songCollection);
             base.Initialize();
         }
 
@@ -82,6 +91,7 @@ namespace Project
                 if (keyboardState.IsKeyDown(Keys.Enter))
                 {
                     gameStates = GameStates.Running;
+                    MediaPlayer.MoveNext();
                 }
             }
             else
@@ -89,12 +99,11 @@ namespace Project
                 if (gameStates == GameStates.Pause)
                 {
                     totalPauseTime += gameTime.ElapsedGameTime.TotalSeconds;
-
                 }
 
                 if (gameStates == GameStates.Running)
                 {
-                #region new attack 
+                    #region new attack 
 
                 for (int i = 0; i < Math.Max(Team1.Count, Team2.Count); i++)
                 {
@@ -129,7 +138,7 @@ namespace Project
                 }
                 #endregion
 
-                #region old attack 
+                    #region old attack 
                 //for (int i = 0; i < Team1.Count; i++)
                 //    foreach (Person p in Team1)
                 //    {
@@ -168,7 +177,7 @@ namespace Project
 
                 #endregion
 
-                #region Keys for summon
+                    #region Keys for summon
 
                 if (keyboardState.IsKeyDown(Keys.A) && !prevkeyboardState.IsKeyDown(Keys.A))
                 {
@@ -192,21 +201,24 @@ namespace Project
 
                 #endregion
 
-                foreach (Person p in Team1) p.Update(gameTime);
-                foreach (Person p in Team2) p.Update(gameTime);
-
-
-
+                    foreach (Person p in Team1) p.Update(gameTime);
+                    foreach (Person p in Team2) p.Update(gameTime);
                 }
+
                 if (keyboardState.IsKeyDown(Keys.P) && !prevkeyboardState.IsKeyDown(Keys.P))
                 {
-                    if (gameStates == GameStates.Pause) gameStates = GameStates.Running;
-                    else if (gameStates == GameStates.Running) gameStates = GameStates.Pause;
+                    if (gameStates == GameStates.Pause)
+                    {
+                        gameStates = GameStates.Running;
+                        MediaPlayer.Resume();
+                    }
+                    else if (gameStates == GameStates.Running)
+                    {
+                        gameStates = GameStates.Pause;
+                        MediaPlayer.Pause();
+                    }
                 }
-            }
-            
-            
-
+            }         
 
             base.Update(gameTime);
         }
@@ -220,11 +232,13 @@ namespace Project
             // TODO: Add your drawing code here
             if(gameStates == GameStates.Start)
             {
+                //put backgound here 
                 _spriteBatch.DrawString(font, "Castle Crusaders", new Vector2(250, 150), Color.Black);
                 _spriteBatch.DrawString(font, "Press 'Enter' to start", new Vector2(300, 200), Color.Black, 0, new Vector2(0,0), 0.5f, SpriteEffects.None, 0);
             }
             if(gameStates == GameStates.Running || gameStates == GameStates.Pause)
             {
+                //put other backgound here
                 if (gameStates == GameStates.Pause)
                 {
                     _spriteBatch.DrawString(font, "Game Paused", new Vector2(250, 150), Color.Black);
