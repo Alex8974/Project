@@ -25,7 +25,7 @@ namespace Project
 
         public override int Armor { get; } = 1;
 
-        public override Vector2 Position { get; set; }
+        //public Vector2 Position { get; set; }
 
         private BoundingRectangle bounds;
         public override BoundingRectangle Bounds { get { return bounds; } }

@@ -23,8 +23,14 @@ namespace Project
         private SpriteFont font;
         private double totalPauseTime = 0;
         SongCollection songCollection;
+        Song song1;
+        Song song2;
+        Texture2D backgoundTexture;
+        double timer = 260;
+        double summontime = 0;
+        double cooldown = 3;
 
-
+        private List<Person> StartscreenTeam = new List<Person>();
         private List<Person> Team1 = new List<Person>();
         private List<Person> Team2 = new List<Person>();
 
@@ -38,6 +44,7 @@ namespace Project
             IsMouseVisible = true;
             world = new World();
             world.Gravity = new Vector2(0, 2);
+            
             var top = 0;
             var bottom = 450;
             var left = 0;
@@ -60,13 +67,16 @@ namespace Project
         {
             // TODO: Add your initialization logic here
             font = Content.Load<SpriteFont>("bangers");
-            Song song1 = Content.Load<Song>("mysong");
-            Song song2 = Content.Load<Song>("mysong2");
-            songCollection.Add(song1);
-            songCollection.Add(song2);
+            song1 = Content.Load<Song>("song1");
+            song2 = Content.Load<Song>("song2");
+            backgoundTexture = Content.Load<Texture2D>("Backgound");
+            StartscreenTeam.Add(new SwordsMan(Content, "Team1"));
+            StartscreenTeam.Add(new Archer(Content, "Team1"));
+            StartscreenTeam[0].Position = new Vector2(400, 327);
+            StartscreenTeam[1].Position = new Vector2(450, 327);
 
 
-            MediaPlayer.Play(songCollection);
+            MediaPlayer.Play(song1);
             base.Initialize();
         }
 
@@ -79,8 +89,8 @@ namespace Project
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
+            
+                
 
             prevkeyboardState = keyboardState;
             keyboardState = Keyboard.GetState();
@@ -91,14 +101,17 @@ namespace Project
                 if (keyboardState.IsKeyDown(Keys.Enter))
                 {
                     gameStates = GameStates.Running;
-                    MediaPlayer.MoveNext();
+                    MediaPlayer.Stop();
+                    MediaPlayer.Play(song2);
                 }
             }
             else
             {
                 if (gameStates == GameStates.Pause)
                 {
-                    totalPauseTime += gameTime.ElapsedGameTime.TotalSeconds;
+                    timer += gameTime.ElapsedGameTime.TotalSeconds;
+                    if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+                        Exit();
                 }
 
                 if (gameStates == GameStates.Running)
@@ -183,21 +196,28 @@ namespace Project
                 {
                     Team1.Add(new SwordsMan(Content, "Team1"));
                 }
+                    if (timer < 160) cooldown = 2;
+                    if(summontime >= cooldown)
+                    {
+                        Team2.Add(new SwordsMan(Content, "Team2"));
+                        summontime = 0;
+                    }
+                    else summontime += gameTime.ElapsedGameTime.TotalSeconds;
 
-                if (keyboardState.IsKeyDown(Keys.S) && !prevkeyboardState.IsKeyDown(Keys.S))
-                {
-                    Team2.Add(new SwordsMan(Content, "Team2"));
-                }
+                //if (keyboardState.IsKeyDown(Keys.S) && !prevkeyboardState.IsKeyDown(Keys.S))
+                //{
+                //    Team2.Add(new SwordsMan(Content, "Team2"));
+                //}
 
-                if (keyboardState.IsKeyDown(Keys.Q) && !prevkeyboardState.IsKeyDown(Keys.Q))
-                {
-                    Team1.Add(new Archer(Content, "Team1"));
-                }
+                //if (keyboardState.IsKeyDown(Keys.Q) && !prevkeyboardState.IsKeyDown(Keys.Q))
+                //{
+                //    Team1.Add(new Archer(Content, "Team1"));
+                //}
 
-                if (keyboardState.IsKeyDown(Keys.W) && !prevkeyboardState.IsKeyDown(Keys.W))
-                {
-                    Team2.Add(new Archer(Content, "Team2"));
-                }
+                //if (keyboardState.IsKeyDown(Keys.W) && !prevkeyboardState.IsKeyDown(Keys.W))
+                //{
+                //    Team2.Add(new Archer(Content, "Team2"));
+                //}
 
                 #endregion
 
@@ -218,7 +238,8 @@ namespace Project
                         MediaPlayer.Pause();
                     }
                 }
-            }         
+            }
+            
 
             base.Update(gameTime);
         }
@@ -226,30 +247,40 @@ namespace Project
         protected override void Draw(GameTime gameTime)
         {
             
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.Black);
 
             _spriteBatch.Begin();
+            _spriteBatch.Draw(backgoundTexture, new Vector2(0, 0), Color.White);
             // TODO: Add your drawing code here
             if(gameStates == GameStates.Start)
             {
                 //put backgound here 
                 _spriteBatch.DrawString(font, "Castle Crusaders", new Vector2(250, 150), Color.Black);
                 _spriteBatch.DrawString(font, "Press 'Enter' to start", new Vector2(300, 200), Color.Black, 0, new Vector2(0,0), 0.5f, SpriteEffects.None, 0);
+                foreach (Person p in StartscreenTeam) p.Draw(_spriteBatch, gameTime);
             }
             if(gameStates == GameStates.Running || gameStates == GameStates.Pause)
             {
+                timer -= gameTime.ElapsedGameTime.TotalSeconds ;
+
                 //put other backgound here
                 if (gameStates == GameStates.Pause)
                 {
                     _spriteBatch.DrawString(font, "Game Paused", new Vector2(250, 150), Color.Black);
+                    _spriteBatch.DrawString(font, "(P) to Unpause", new Vector2(325, 200), Color.Black, 0, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0);
+                    _spriteBatch.DrawString(font, "(ESC) to Quit", new Vector2(325, 225), Color.Black, 0, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0);
+
                 }
                 foreach (Person p in Team1) p.Draw(_spriteBatch, gameTime);
                 foreach (Person p in Team2) p.Draw(_spriteBatch, gameTime);
+
+                _spriteBatch.DrawString(font, $"{Math.Round( timer)} : Seconds to Surivive", new Vector2(300, 50), Color.Black, 0, new Vector2(0, 0), 0.25f, SpriteEffects.None, 0);
+
             }
 
-            
 
-            
+
+
 
             _spriteBatch.End();
             base.Draw(gameTime);

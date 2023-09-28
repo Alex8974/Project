@@ -58,7 +58,7 @@ namespace Project
         /// <summary>
         /// the position in the top left corner
         /// </summary>
-        public abstract Vector2 Position { get; set; }
+        public Vector2 Position { get; set; }
 
         /// <summary>
         /// moves the person 

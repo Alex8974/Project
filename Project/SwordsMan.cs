@@ -12,6 +12,7 @@ using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Content;
 using CollisionExample.Collisions;
+using SharpDX.DirectWrite;
 //using SharpDX.Direct2D1;
 
 namespace Project
@@ -20,8 +21,9 @@ namespace Project
     {
         //the texture
         public Texture2D texture;
+        private Random r = new Random();
 
-        public override Vector2 Position { get; set; }
+        //public Vector2 Position { get; set; }
 
         public override int Health { get; set; } = 8;
 
@@ -46,16 +48,14 @@ namespace Project
             if(Team == "Team1") texture = c.Load<Texture2D>("Team1KnightAllWalkingAnimations");
             if (Team == "Team2") texture = c.Load<Texture2D>("Team2KnightAllanimaitons");
 
-
-
             if (Team == "Team1")
             {
-                Position = new Vector2(50, 300);
+                Position = new Vector2(50, 327);
                 team = 1;
             }
             else if (Team == "Team2") 
             {
-                Position = new Vector2(650, 300);
+                Position = new Vector2(715, 327);
                 team = -1; 
             }
             else throw new Exception($"bad team name: {Team}");
@@ -82,7 +82,8 @@ namespace Project
             if(AttackCoolDown > 0.5)
             {
                 frameRow = SpriteSheetPicker.SwordRight;
-                other.Health -= (this.Damage - other.Armor);
+                int hold = r.Next(Damage - 2, Damage+1);
+                other.Health -= (hold - other.Armor);
                 AttackCoolDown = 0;
             }
         }
