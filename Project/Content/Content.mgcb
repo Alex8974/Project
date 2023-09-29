@@ -13,6 +13,12 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin hitHurtProject.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:hitHurtProject.wav
+
 #begin song1.mp3
 /importer:Mp3Importer
 /processor:SongProcessor

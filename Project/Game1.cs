@@ -9,6 +9,7 @@ using nkast.Aether.Physics2D.Dynamics;
 using Microsoft.VisualBasic;
 using System.Xml.Schema;
 using Microsoft.Xna.Framework.Media;
+using Microsoft.Xna.Framework.Audio;
 //using System.Windows.Forms;
 
 namespace Project
@@ -25,10 +26,11 @@ namespace Project
         SongCollection songCollection;
         Song song1;
         Song song2;
+        private SoundEffect swordSlash;
         Texture2D backgoundTexture;
         double timer = 260;
         double summontime = 0;
-        double cooldown = 3;
+        double cooldown = 4;
 
         private List<Person> StartscreenTeam = new List<Person>();
         private List<Person> Team1 = new List<Person>();
@@ -71,7 +73,7 @@ namespace Project
             song2 = Content.Load<Song>("song2");
             backgoundTexture = Content.Load<Texture2D>("Backgound");
             StartscreenTeam.Add(new SwordsMan(Content, "Team1"));
-            StartscreenTeam.Add(new Archer(Content, "Team1"));
+            StartscreenTeam.Add(new SwordsMan(Content, "Team2"));
             StartscreenTeam[0].Position = new Vector2(400, 327);
             StartscreenTeam[1].Position = new Vector2(450, 327);
 
@@ -83,7 +85,6 @@ namespace Project
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-
             // TODO: use this.Content to load your game content here
         }
 
@@ -93,7 +94,10 @@ namespace Project
             bool[] winloss = CheckForWin();
             if (winloss[0] || timer < 0) gameScreens = GameScreens.Win;
             if (winloss[1]) gameScreens = GameScreens.Lose;
-                
+            if(gameScreens == GameScreens.Win || gameScreens == GameScreens.Lose)
+            {
+                if (keyboardState.IsKeyDown(Keys.Escape)) Exit();
+            }
 
             prevkeyboardState = keyboardState;
             keyboardState = Keyboard.GetState();
@@ -195,11 +199,11 @@ namespace Project
 
                     #region Keys for summon
 
-                if (keyboardState.IsKeyDown(Keys.A) && !prevkeyboardState.IsKeyDown(Keys.A))
-                {
-                    Team1.Add(new SwordsMan(Content, "Team1"));
-                }
-                    if (timer < 160) cooldown = 2;
+                    if (keyboardState.IsKeyDown(Keys.A) && !prevkeyboardState.IsKeyDown(Keys.A))
+                    {
+                        Team1.Add(new SwordsMan(Content, "Team1"));
+                    }
+                    if (timer < 165) cooldown = 2;
                     if(summontime >= cooldown)
                     {
                         Team2.Add(new SwordsMan(Content, "Team2"));
@@ -252,8 +256,8 @@ namespace Project
             bool[] winLoss = new bool[2];
             winLoss[0] = false;
             winLoss[0] = false;
-            foreach (Person p in Team1) if (p.Position.X > 750) winLoss[0] = true;
-            foreach (Person p in Team2) if (p.Position.X < 0) winLoss[1] = true;
+            foreach (Person p in Team1) if (p.Position.X > 750 && p.IsAlive == true) winLoss[0] = true;
+            foreach (Person p in Team2) if (p.Position.X < 0 && p.IsAlive == true) winLoss[1] = true;
             return winLoss;
         }
 
@@ -263,7 +267,14 @@ namespace Project
             GraphicsDevice.Clear(Color.Black);
 
             _spriteBatch.Begin();
-            _spriteBatch.Draw(backgoundTexture, new Vector2(0, 0), Color.White);
+            if(gameScreens == GameScreens.Win || gameScreens == GameScreens.Lose)
+            {
+                if (gameScreens == GameScreens.Win) _spriteBatch.DrawString(font, "You Win!", new Vector2(325, 225), Color.White, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 0);
+                else if (gameScreens == GameScreens.Lose) _spriteBatch.DrawString(font, "You Lose", new Vector2(325, 225), Color.White, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 0);
+                _spriteBatch.DrawString(font, "Press (ESC) to Quit", new Vector2(325, 275), Color.White, 0, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0);
+            }
+            else _spriteBatch.Draw(backgoundTexture, new Vector2(0, 0), Color.White);
+
             // TODO: Add your drawing code here
             if(gameScreens == GameScreens.Start)
             {
@@ -276,6 +287,12 @@ namespace Project
             {
                 timer -= gameTime.ElapsedGameTime.TotalSeconds ;
 
+                if(Team1.Count == 0)
+                {
+                    _spriteBatch.DrawString(font, "Press (A) to summon", new Vector2(307, 100), Color.Black, 0, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0);
+                    _spriteBatch.DrawString(font, "Press (P) to Pause", new Vector2(320, 125), Color.Black, 0, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0);
+
+                }
                 //put other backgound here
                 if (gameScreens == GameScreens.Pause)
                 {
@@ -287,17 +304,8 @@ namespace Project
                 foreach (Person p in Team1) p.Draw(_spriteBatch, gameTime);
                 foreach (Person p in Team2) p.Draw(_spriteBatch, gameTime);
 
-                _spriteBatch.DrawString(font, $"{Math.Round( timer)} : Seconds to Surivive", new Vector2(300, 50), Color.Black, 0, new Vector2(0, 0), 0.25f, SpriteEffects.None, 0);
+                _spriteBatch.DrawString(font, $"{Math.Round( timer)} : Seconds to Surivive", new Vector2(310, 50), Color.Black, 0, new Vector2(0, 0), 0.25f, SpriteEffects.None, 0);
             }
-
-            if( gameScreens == GameScreens.Win) _spriteBatch.DrawString(font, "You Win!", new Vector2(325, 225), Color.White, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 0);
-
-            if ( gameScreens == GameScreens.Win) _spriteBatch.DrawString(font, "You Lose", new Vector2(325, 225), Color.White, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 0);
-
-
-
-
-
             _spriteBatch.End();
             base.Draw(gameTime);
         }

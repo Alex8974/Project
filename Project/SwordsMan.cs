@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework.Content;
 using CollisionExample.Collisions;
 using SharpDX.DirectWrite;
+using Microsoft.Xna.Framework.Audio;
 //using SharpDX.Direct2D1;
 
 namespace Project
@@ -22,6 +23,7 @@ namespace Project
         //the texture
         public Texture2D texture;
         private Random r = new Random();
+        private SoundEffect swordSlash;
 
         //public Vector2 Position { get; set; }
 
@@ -59,6 +61,7 @@ namespace Project
                 team = -1; 
             }
             else throw new Exception($"bad team name: {Team}");
+            swordSlash = c.Load<SoundEffect>("hitHurtProject");
 
             bounds = new BoundingRectangle(Position, size, size);
         }
@@ -85,6 +88,7 @@ namespace Project
                 int hold = r.Next(Damage - 2, Damage+1);
                 other.Health -= (hold - other.Armor);
                 AttackCoolDown = 0;
+                swordSlash.Play();
             }
         }
 
