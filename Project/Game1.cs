@@ -10,6 +10,8 @@ using Microsoft.VisualBasic;
 using System.Xml.Schema;
 using Microsoft.Xna.Framework.Media;
 using Microsoft.Xna.Framework.Audio;
+using Project.Screens;
+using SharpDX.Direct3D9;
 //using System.Windows.Forms;
 
 namespace Project
@@ -32,7 +34,11 @@ namespace Project
         double summontime = 0;
         double cooldown = 4;
 
-        private List<Person> StartscreenTeam = new List<Person>();
+        private StartScreen startScreen;
+        private PauseScreen pauseScreen;
+        private WinLoseScreen winLoseScreen;
+
+        
         private List<Person> Team1 = new List<Person>();
         private List<Person> Team2 = new List<Person>();
 
@@ -58,6 +64,10 @@ namespace Project
                 world.CreateEdge(new Vector2(right, top), new Vector2(right, bottom))
             };
 
+            startScreen = new StartScreen();
+            pauseScreen = new PauseScreen();
+            winLoseScreen = new WinLoseScreen();
+
             foreach (var edge in edges)
             {
                 edge.BodyType = BodyType.Static;
@@ -72,13 +82,11 @@ namespace Project
             song1 = Content.Load<Song>("song1");
             song2 = Content.Load<Song>("song2");
             backgoundTexture = Content.Load<Texture2D>("Backgound");
-            StartscreenTeam.Add(new SwordsMan(Content, "Team1"));
-            StartscreenTeam.Add(new SwordsMan(Content, "Team2"));
-            StartscreenTeam[0].Position = new Vector2(400, 327);
-            StartscreenTeam[1].Position = new Vector2(450, 327);
-
-
             MediaPlayer.Play(song1);
+
+            startScreen.Initilze(Content);
+            
+
             base.Initialize();
         }
 
@@ -91,12 +99,12 @@ namespace Project
         protected override void Update(GameTime gameTime)
         {
 
-            bool[] winloss = CheckForWin();
+            bool[] winloss = winLoseScreen.CheckforWin(Team1, Team2);
             if (winloss[0] || timer < 0) gameScreens = GameScreens.Win;
             if (winloss[1]) gameScreens = GameScreens.Lose;
             if(gameScreens == GameScreens.Win || gameScreens == GameScreens.Lose)
             {
-                if (keyboardState.IsKeyDown(Keys.Escape)) Exit();
+                 if(winLoseScreen.Update(gameTime, keyboardState)) Exit();
             }
 
             prevkeyboardState = keyboardState;
@@ -105,7 +113,7 @@ namespace Project
 
             if(gameScreens == GameScreens.Start)
             {
-                if (keyboardState.IsKeyDown(Keys.Enter))
+                if(startScreen.Update(gameTime, keyboardState) != GameScreens.Start)
                 {
                     gameScreens = GameScreens.Running;
                     MediaPlayer.Stop();
@@ -117,8 +125,7 @@ namespace Project
                 if (gameScreens == GameScreens.Pause)
                 {
                     timer += gameTime.ElapsedGameTime.TotalSeconds;
-                    if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                        Exit();
+                    if (pauseScreen.Update(gameTime, keyboardState)) Exit();                    
                 }
 
                 if (gameScreens == GameScreens.Running)
@@ -156,45 +163,6 @@ namespace Project
                         }
                     }
                 }
-                #endregion
-
-                    #region old attack 
-                //for (int i = 0; i < Team1.Count; i++)
-                //    foreach (Person p in Team1)
-                //    {
-                //        var p = Team1[i];
-                //        foreach (Person p1 in Team2)
-                //        {
-                //            Team1[i].CheckForAttack(Team2);
-                //            if (CollisionHelper.Collides(p.Bounds, p1.Bounds) && p.IsAlive && p1.IsAlive)
-                //            {
-                //                p.Speed = 0;
-                //                p1.Speed = 0;
-
-                //                p1.Attack(p);
-                //                p.Attack(p1);
-
-                //                if (p.Health <= 0)
-                //                {
-                //                    p.IsAlive = false;
-                //                }
-                //                if (p1.Health <= 0)
-                //                {
-                //                    p1.IsAlive = false;
-                //                }
-                //            }
-                //        }
-                //        for (int j = i + 1; j < Team1.Count; j++)
-                //        {
-                //            if (CollisionHelper.Collides(p.Bounds, Team1[j].Bounds))
-                //            {
-                //                //p.Speed = 0;
-                //                Team1[j].Speed = 0;
-                //                Team1[j].frameRow = SpriteSheetPicker.StandingRight;
-                //            }
-                //        }
-                //    }
-
                 #endregion
 
                     #region Keys for summon
@@ -251,40 +219,30 @@ namespace Project
             base.Update(gameTime);
         }
 
-        private bool[] CheckForWin()
-        {
-            bool[] winLoss = new bool[2];
-            winLoss[0] = false;
-            winLoss[0] = false;
-            foreach (Person p in Team1) if (p.Position.X > 750 && p.IsAlive == true) winLoss[0] = true;
-            foreach (Person p in Team2) if (p.Position.X < 0 && p.IsAlive == true) winLoss[1] = true;
-            return winLoss;
-        }
-
         protected override void Draw(GameTime gameTime)
         {
             
             GraphicsDevice.Clear(Color.Black);
 
             _spriteBatch.Begin();
-            if(gameScreens == GameScreens.Win || gameScreens == GameScreens.Lose)
-            {
-                if (gameScreens == GameScreens.Win) _spriteBatch.DrawString(font, "You Win!", new Vector2(325, 225), Color.White, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 0);
-                else if (gameScreens == GameScreens.Lose) _spriteBatch.DrawString(font, "You Lose", new Vector2(325, 225), Color.White, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 0);
-                _spriteBatch.DrawString(font, "Press (ESC) to Quit", new Vector2(325, 275), Color.White, 0, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0);
-            }
-            else _spriteBatch.Draw(backgoundTexture, new Vector2(0, 0), Color.White);
 
-            // TODO: Add your drawing code here
-            if(gameScreens == GameScreens.Start)
+            #region The win / lose section
+            if (gameScreens == GameScreens.Win || gameScreens == GameScreens.Lose)
             {
-                //put backgound here 
-                _spriteBatch.DrawString(font, "Castle Crusaders", new Vector2(250, 150), Color.Black);
-                _spriteBatch.DrawString(font, "Press 'Enter' to start", new Vector2(300, 200), Color.Black, 0, new Vector2(0,0), 0.5f, SpriteEffects.None, 0);
-                foreach (Person p in StartscreenTeam) p.Draw(_spriteBatch, gameTime);
+                if (gameScreens == GameScreens.Win) _spriteBatch.DrawString(font, "You Win!", new Vector2(300, 150), Color.White, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 0);
+                else if (gameScreens == GameScreens.Lose) _spriteBatch.DrawString(font, "You Lose", new Vector2(300, 150), Color.White, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 0);
+                _spriteBatch.DrawString(font, "Press (ESC) to Quit", new Vector2(295, 200), Color.White, 0, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0);
+            }
+            #endregion
+
+
+            if (gameScreens == GameScreens.Start)
+            {
+                startScreen.Draw(gameTime, _spriteBatch, font, backgoundTexture);
             }
             if(gameScreens == GameScreens.Running || gameScreens == GameScreens.Pause)
             {
+                _spriteBatch.Draw(backgoundTexture, new Vector2(0, 0), Color.White);
                 timer -= gameTime.ElapsedGameTime.TotalSeconds ;
 
                 if(Team1.Count == 0)
@@ -293,14 +251,8 @@ namespace Project
                     _spriteBatch.DrawString(font, "Press (P) to Pause", new Vector2(320, 125), Color.Black, 0, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0);
 
                 }
-                //put other backgound here
-                if (gameScreens == GameScreens.Pause)
-                {
-                    _spriteBatch.DrawString(font, "Game Paused", new Vector2(250, 150), Color.Black);
-                    _spriteBatch.DrawString(font, "(P) to Unpause", new Vector2(325, 200), Color.Black, 0, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0);
-                    _spriteBatch.DrawString(font, "(ESC) to Quit", new Vector2(325, 225), Color.Black, 0, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0);
+                if (gameScreens == GameScreens.Pause) pauseScreen.Draw(gameTime, _spriteBatch, font);
 
-                }
                 foreach (Person p in Team1) p.Draw(_spriteBatch, gameTime);
                 foreach (Person p in Team2) p.Draw(_spriteBatch, gameTime);
 
