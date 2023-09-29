@@ -19,7 +19,7 @@ namespace Project
         private SpriteBatch _spriteBatch;
         private KeyboardState keyboardState;
         private KeyboardState prevkeyboardState;
-        private GameStates gameStates = GameStates.Start;
+        private GameScreens gameScreens = GameScreens.Start;
         private SpriteFont font;
         private double totalPauseTime = 0;
         SongCollection songCollection;
@@ -89,32 +89,35 @@ namespace Project
 
         protected override void Update(GameTime gameTime)
         {
-            
+
+            bool[] winloss = CheckForWin();
+            if (winloss[0] || timer < 0) gameScreens = GameScreens.Win;
+            if (winloss[1]) gameScreens = GameScreens.Lose;
                 
 
             prevkeyboardState = keyboardState;
             keyboardState = Keyboard.GetState();
             // TODO: Add your update logic here
 
-            if(gameStates == GameStates.Start)
+            if(gameScreens == GameScreens.Start)
             {
                 if (keyboardState.IsKeyDown(Keys.Enter))
                 {
-                    gameStates = GameStates.Running;
+                    gameScreens = GameScreens.Running;
                     MediaPlayer.Stop();
                     MediaPlayer.Play(song2);
                 }
             }
             else
             {
-                if (gameStates == GameStates.Pause)
+                if (gameScreens == GameScreens.Pause)
                 {
                     timer += gameTime.ElapsedGameTime.TotalSeconds;
                     if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                         Exit();
                 }
 
-                if (gameStates == GameStates.Running)
+                if (gameScreens == GameScreens.Running)
                 {
                     #region new attack 
 
@@ -227,14 +230,14 @@ namespace Project
 
                 if (keyboardState.IsKeyDown(Keys.P) && !prevkeyboardState.IsKeyDown(Keys.P))
                 {
-                    if (gameStates == GameStates.Pause)
+                    if (gameScreens == GameScreens.Pause)
                     {
-                        gameStates = GameStates.Running;
+                        gameScreens = GameScreens.Running;
                         MediaPlayer.Resume();
                     }
-                    else if (gameStates == GameStates.Running)
+                    else if (gameScreens == GameScreens.Running)
                     {
-                        gameStates = GameStates.Pause;
+                        gameScreens = GameScreens.Pause;
                         MediaPlayer.Pause();
                     }
                 }
@@ -242,6 +245,16 @@ namespace Project
             
 
             base.Update(gameTime);
+        }
+
+        private bool[] CheckForWin()
+        {
+            bool[] winLoss = new bool[2];
+            winLoss[0] = false;
+            winLoss[0] = false;
+            foreach (Person p in Team1) if (p.Position.X > 750) winLoss[0] = true;
+            foreach (Person p in Team2) if (p.Position.X < 0) winLoss[1] = true;
+            return winLoss;
         }
 
         protected override void Draw(GameTime gameTime)
@@ -252,19 +265,19 @@ namespace Project
             _spriteBatch.Begin();
             _spriteBatch.Draw(backgoundTexture, new Vector2(0, 0), Color.White);
             // TODO: Add your drawing code here
-            if(gameStates == GameStates.Start)
+            if(gameScreens == GameScreens.Start)
             {
                 //put backgound here 
                 _spriteBatch.DrawString(font, "Castle Crusaders", new Vector2(250, 150), Color.Black);
                 _spriteBatch.DrawString(font, "Press 'Enter' to start", new Vector2(300, 200), Color.Black, 0, new Vector2(0,0), 0.5f, SpriteEffects.None, 0);
                 foreach (Person p in StartscreenTeam) p.Draw(_spriteBatch, gameTime);
             }
-            if(gameStates == GameStates.Running || gameStates == GameStates.Pause)
+            if(gameScreens == GameScreens.Running || gameScreens == GameScreens.Pause)
             {
                 timer -= gameTime.ElapsedGameTime.TotalSeconds ;
 
                 //put other backgound here
-                if (gameStates == GameStates.Pause)
+                if (gameScreens == GameScreens.Pause)
                 {
                     _spriteBatch.DrawString(font, "Game Paused", new Vector2(250, 150), Color.Black);
                     _spriteBatch.DrawString(font, "(P) to Unpause", new Vector2(325, 200), Color.Black, 0, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0);
@@ -275,8 +288,11 @@ namespace Project
                 foreach (Person p in Team2) p.Draw(_spriteBatch, gameTime);
 
                 _spriteBatch.DrawString(font, $"{Math.Round( timer)} : Seconds to Surivive", new Vector2(300, 50), Color.Black, 0, new Vector2(0, 0), 0.25f, SpriteEffects.None, 0);
-
             }
+
+            if( gameScreens == GameScreens.Win) _spriteBatch.DrawString(font, "You Win!", new Vector2(325, 225), Color.White, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 0);
+
+            if ( gameScreens == GameScreens.Win) _spriteBatch.DrawString(font, "You Lose", new Vector2(325, 225), Color.White, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 0);
 
 
 

@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 
 namespace Project
 {
-    public enum GameStates
+    public enum GameScreens
     {
         Start, 
         Running,
-        Pause
+        Pause,
+        Win,
+        Lose
     }
 }
