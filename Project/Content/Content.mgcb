@@ -25,7 +25,7 @@
 /processorParam:Quality=Best
 /build:song1.mp3
 
-#begin son2.mp3
+#begin song2.mp3
 /importer:Mp3Importer
 /processor:SongProcessor
 /processorParam:Quality=Best

@@ -41,12 +41,12 @@ namespace Project
 
             if (Team == "Team1")
             {
-                Position = new Vector2(50, 350);
+                Position = new Vector2(50, 328);
                 team = 1;
             }
             else if (Team == "Team2")
             {
-                Position = new Vector2(650, 350);
+                Position = new Vector2(650, 328);
                 team = -1;
             }
             else throw new Exception($"bad team name: {Team}");
@@ -68,6 +68,7 @@ namespace Project
                 {
                     hold = CollisionHelper.Collides(this.Bounds, p.Bounds);
                     holdp = p;
+                    break;
                 }
                 i++;
                 bounds.X = Position.X;
@@ -81,15 +82,17 @@ namespace Project
 
         public override void Attack(Person other)
         {
-            if (AttackCoolDown > 1.0)
+            if (AttackCoolDown > 2.0)
             {
-                if(team == 1) arrows.Add(new Arrow(Position + new Vector2(16,0), cm));
-                if(team == 2) arrows.Add(new Arrow(Position, cm));
+                if(team == 1) arrows.Add(new Arrow(Position + new Vector2(16,0), cm, team));
+                if(team == 2) arrows.Add(new Arrow(Position, cm, team));
+                AttackCoolDown = 0;
             }
         }
 
         public override void Update(GameTime gT)
         {
+            if (Health <= 0) IsAlive = false;
             this.AttackCoolDown += gT.ElapsedGameTime.TotalSeconds;
             bounds.X = Position.X;
             bounds.Y = Position.Y;
@@ -99,7 +102,7 @@ namespace Project
                 Move(gT);
                 frameRow = SpriteSheetPicker.WalkingRighBow;
             }
-
+            foreach (Arrow a in arrows) a.Update(gT);
 
             Speed = 20;
         }
@@ -113,23 +116,15 @@ namespace Project
             {
                 if (animationTimer > ANIMATION_TIMER)
                 {
-                    if (animationFrame < 3)
-                    {
-                        animationFrame++;
-                    }
-                    else
-                    {
-                        animationFrame = 0;
-                    }
+                    if (animationFrame < 3) animationFrame++;                  
+                    else animationFrame = 0;
+                    
                     animationTimer = 0;
                 }
             }
-            else
-            {
-                source = new Rectangle(0, (int)frameRow * 16, 16, 16);
-            }
+            else source = new Rectangle(0, (int)frameRow * 16, 16, 16);
 
-
+            foreach (Arrow a in arrows) a.Draw(s);
 
             if (this.IsAlive)
             {

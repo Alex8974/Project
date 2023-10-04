@@ -179,22 +179,22 @@ namespace Project
                     }
                     else summontime += gameTime.ElapsedGameTime.TotalSeconds;
 
-                //if (keyboardState.IsKeyDown(Keys.S) && !prevkeyboardState.IsKeyDown(Keys.S))
-                //{
-                //    Team2.Add(new SwordsMan(Content, "Team2"));
-                //}
+                    //if (keyboardState.IsKeyDown(Keys.S) && !prevkeyboardState.IsKeyDown(Keys.S))
+                    //{
+                    //    Team2.Add(new SwordsMan(Content, "Team2"));
+                    //}
 
-                //if (keyboardState.IsKeyDown(Keys.Q) && !prevkeyboardState.IsKeyDown(Keys.Q))
-                //{
-                //    Team1.Add(new Archer(Content, "Team1"));
-                //}
+                    if (keyboardState.IsKeyDown(Keys.Q) && !prevkeyboardState.IsKeyDown(Keys.Q))
+                    {
+                        Team1.Add(new Archer(Content, "Team1"));
+                    }
 
-                //if (keyboardState.IsKeyDown(Keys.W) && !prevkeyboardState.IsKeyDown(Keys.W))
-                //{
-                //    Team2.Add(new Archer(Content, "Team2"));
-                //}
+                    //if (keyboardState.IsKeyDown(Keys.W) && !prevkeyboardState.IsKeyDown(Keys.W))
+                    //{
+                    //    Team2.Add(new Archer(Content, "Team2"));
+                    //}
 
-                #endregion
+                    #endregion
 
                     foreach (Person p in Team1) p.Update(gameTime);
                     foreach (Person p in Team2) p.Update(gameTime);
