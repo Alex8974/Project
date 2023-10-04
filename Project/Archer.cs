@@ -68,7 +68,7 @@ namespace Project
                 {
                     hold = CollisionHelper.Collides(this.Bounds, p.Bounds);
                     holdp = p;
-                    break;
+                    if(hold) break;
                 }
                 i++;
                 bounds.X = Position.X;
