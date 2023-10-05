@@ -25,7 +25,6 @@ namespace Project
         private GameScreens gameScreens = GameScreens.Start;
         private SpriteFont font;
         private double totalPauseTime = 0;
-        SongCollection songCollection;
         Song song1;
         Song song2;
         private SoundEffect swordSlash;

@@ -78,6 +78,10 @@ namespace Project
                 Attack(holdp);
                 Speed = 0;
             }
+
+            foreach (Arrow a in arrows) a.CheckForHit(otherp);
+
+            for (int j = 0; j < arrows.Count; j++) if (arrows[j].active == false) arrows.RemoveAt(j);
         }
 
         public override void Attack(Person other)

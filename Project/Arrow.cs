@@ -18,9 +18,10 @@ namespace Project
     {
         public Texture2D texture;
         public Vector2 Position;
+        public int damage = 4;
 
         public bool active = true;
-        public int Speed = 30;
+        public int Speed = 10;
         public int team;
         private Color color;
 
@@ -50,6 +51,29 @@ namespace Project
         {
             if(team == 1) Position += new Vector2(Speed, 0);
             if(team != 1) Position -= new Vector2(Speed, 0);
+        }
+
+        public void CheckForHit(List<Person> otherTeam)
+        {
+            bool hold = false;
+            Person holdp = null;
+            foreach(Person p in otherTeam)
+            {
+                if (p.Position.X <= this.Position.X) hold = true;
+                if (hold)
+                {
+                    holdp = p;
+                    break;
+                }
+            }
+
+            if (hold)
+            {
+                holdp.Health -= (this.damage - holdp.Armor);
+                this.active = false;
+            }
+
+
         }
 
         public void Draw(SpriteBatch spriteBatch)
