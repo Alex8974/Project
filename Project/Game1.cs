@@ -198,6 +198,13 @@ namespace Project
 
                     foreach (Person p in Team1) p.Update(gameTime);
                     foreach (Person p in Team2) p.Update(gameTime);
+
+                    #region cleaning lists
+
+                    for (int i = 0; i < Team1.Count; i++) if (Team1[i].IsAlive == false) Team1.Remove(Team1[i]);
+                    for (int i = 0; i < Team2.Count; i++) if (Team2[i].IsAlive == false) Team2.Remove(Team2[i]);
+
+                    #endregion
                 }
 
                 if (keyboardState.IsKeyDown(Keys.P) && !prevkeyboardState.IsKeyDown(Keys.P))
