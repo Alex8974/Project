@@ -77,14 +77,7 @@ namespace Project
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            font = Content.Load<SpriteFont>("bangers");
-            song1 = Content.Load<Song>("song1");
-            song2 = Content.Load<Song>("song2");
-            backgoundTexture = Content.Load<Texture2D>("Backgound");
-            MediaPlayer.Play(song1);
-
             startScreen.Initilze(Content);
-            
 
             base.Initialize();
         }
@@ -92,11 +85,19 @@ namespace Project
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+            font = Content.Load<SpriteFont>("bangers");
+            song1 = Content.Load<Song>("song1");
+            song2 = Content.Load<Song>("song2");
+            backgoundTexture = Content.Load<Texture2D>("Backgound");
+            MediaPlayer.Play(song1);
+
             // TODO: use this.Content to load your game content here
         }
 
         protected override void Update(GameTime gameTime)
         {
+
+            #region Check for win/loss
 
             bool[] winloss = winLoseScreen.CheckforWin(Team1, Team2);
             if (winloss[0] || timer < 0) gameScreens = GameScreens.Win;
@@ -105,6 +106,8 @@ namespace Project
             {
                  if(winLoseScreen.Update(gameTime, keyboardState)) Exit();
             }
+
+            #endregion
 
             prevkeyboardState = keyboardState;
             keyboardState = Keyboard.GetState();

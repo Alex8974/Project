@@ -32,6 +32,10 @@ namespace Project
         public override bool IsAlive { get; set; } = true;
 
         public override double AttackCoolDown { get; set; }
+        /// <summary>
+        /// the time it takes to attack
+        /// </summary>
+        private double timeToAttack = 2.0;
 
         public Archer(ContentManager c, string Team)
         {
@@ -77,6 +81,11 @@ namespace Project
             {
                 Attack(holdp);
                 Speed = 0;
+                frameRow = SpriteSheetPicker.BowRight;
+            }
+            else
+            {
+                frameRow = SpriteSheetPicker.WalkingRighBow;
             }
 
             foreach (Arrow a in arrows) a.CheckForHit(otherp);
@@ -86,7 +95,7 @@ namespace Project
 
         public override void Attack(Person other)
         {
-            if (AttackCoolDown > 2.0)
+            if (AttackCoolDown > timeToAttack)
             {
                 if(team == 1) arrows.Add(new Arrow(Position + new Vector2(16,0), cm, team));
                 if(team == 2) arrows.Add(new Arrow(Position, cm, team));
@@ -101,11 +110,13 @@ namespace Project
             bounds.X = Position.X;
             bounds.Y = Position.Y;
 
-            if (Speed > 0) 
-            { 
+            if (Speed > 0)
+            {
                 Move(gT);
                 frameRow = SpriteSheetPicker.WalkingRighBow;
             }
+            else if (Speed == 0 && AttackCoolDown < timeToAttack) frameRow = SpriteSheetPicker.StandingRight;
+            
             foreach (Arrow a in arrows) a.Update(gT);
 
             Speed = 20;
@@ -118,7 +129,7 @@ namespace Project
 
             if ((int)frameRow > 3)
             {
-                if (animationTimer > ANIMATION_TIMER)
+                if (animationTimer > ANIMATION_TIMER * 2)
                 {
                     if (animationFrame < 3) animationFrame++;                  
                     else animationFrame = 0;
