@@ -31,6 +31,19 @@
 /processorParam:Quality=Best
 /build:song2.mp3
 
+#begin flying_dragon-red.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:flying_dragon-red.png
+
+
 #begin Backgound.png
 /importer:TextureImporter
 /processor:TextureProcessor

@@ -21,7 +21,7 @@ namespace Project
         private ContentManager cm;
         public override int Health { get; set; } = 8;
         public override int Speed { get; set; } = 20;
-        public override int Damage { get; set; } = 3;
+        public override int Damage { get; } = 3;
 
         public override int Armor { get; } = 1;
 
@@ -35,7 +35,7 @@ namespace Project
         /// <summary>
         /// the time it takes to attack
         /// </summary>
-        private double timeToAttack = 2.0;
+        private double timeToAttack = 1.0;
 
         public Archer(ContentManager c, string Team)
         {
@@ -81,11 +81,10 @@ namespace Project
             {
                 Attack(holdp);
                 Speed = 0;
-                frameRow = SpriteSheetPicker.BowRight;
             }
             else
             {
-                frameRow = SpriteSheetPicker.WalkingRighBow;
+                attacking = false;
             }
 
             foreach (Arrow a in arrows) a.CheckForHit(otherp);
@@ -95,6 +94,8 @@ namespace Project
 
         public override void Attack(Person other)
         {
+            attacking = true;
+            frameRow = SpriteSheetPicker.BowRight;
             if (AttackCoolDown > timeToAttack)
             {
                 if(team == 1) arrows.Add(new Arrow(Position + new Vector2(16,0), cm, team));
@@ -115,7 +116,7 @@ namespace Project
                 Move(gT);
                 frameRow = SpriteSheetPicker.WalkingRighBow;
             }
-            else if (Speed == 0 && AttackCoolDown < timeToAttack) frameRow = SpriteSheetPicker.StandingRight;
+            //else if (Speed == 0 && attacking == false) frameRow = SpriteSheetPicker.StandingRight;
             
             foreach (Arrow a in arrows) a.Update(gT);
 
@@ -127,11 +128,15 @@ namespace Project
             Rectangle source = new Rectangle(animationFrame * 16, (int)frameRow * 16, 16, 16);
             animationTimer += gT.ElapsedGameTime.TotalSeconds;
 
+            if (attacking) frameRow = SpriteSheetPicker.BowRight;
+            //else frameRow = SpriteSheetPicker.WalkingRighBow;
+
             if ((int)frameRow > 3)
             {
                 if (animationTimer > ANIMATION_TIMER * 2)
                 {
-                    if (animationFrame < 3) animationFrame++;                  
+                    if (animationFrame < 3 && attacking == false) animationFrame++;                  
+                    else if (animationFrame < 4 && attacking == true) animationFrame++;                  
                     else animationFrame = 0;
                     
                     animationTimer = 0;

@@ -17,7 +17,15 @@ namespace Project
         public SpriteSheetPicker frameRow = SpriteSheetPicker.WalkingRight;
         protected int animationFrame = 0;
         protected double animationTimer;
+
+        /// <summary>
+        /// if the person is attacking
+        /// </summary>
         protected bool attacking;
+
+        /// <summary>
+        /// 1 for the left other number for the right
+        /// </summary>
         public int team { get; set; }
 
         /// <summary>
@@ -38,7 +46,7 @@ namespace Project
         /// <summary>
         /// the attack damage
         /// </summary>
-        public abstract int Damage { get; set; }
+        public abstract int Damage { get; }
 
         /// <summary>
         /// the armor negates some of the damage

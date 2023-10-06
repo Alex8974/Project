@@ -171,6 +171,7 @@ namespace Project
 
                     if (keyboardState.IsKeyDown(Keys.A) && !prevkeyboardState.IsKeyDown(Keys.A))
                     {
+                        Team2.Add(new Dragon(Content, -1));
                         Team1.Add(new SwordsMan(Content, "Team1"));
                     }
                     if (timer < 165) cooldown = 2;

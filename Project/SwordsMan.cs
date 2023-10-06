@@ -30,7 +30,7 @@ namespace Project
         public override int Health { get; set; } = 8;
 
         public override int Speed { get; set; } = 30;
-        public override int Damage { get; set; } = 4;
+        public override int Damage { get; } = 4;
         public override int Armor { get; } = 2;
         public override double AttackCoolDown { get; set; } = 0;
 
