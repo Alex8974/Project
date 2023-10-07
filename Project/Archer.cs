@@ -14,8 +14,6 @@ namespace Project
 {
     public class Archer : Person
     {
-        private Texture2D texture;
-
         public List<Arrow> arrows = new List<Arrow>();
 
         private ContentManager cm;
@@ -82,10 +80,7 @@ namespace Project
                 Attack(holdp);
                 Speed = 0;
             }
-            else
-            {
-                attacking = false;
-            }
+            else attacking = false;
 
             foreach (Arrow a in arrows) a.CheckForHit(otherp);
 
@@ -137,8 +132,7 @@ namespace Project
                 {
                     if (animationFrame < 3 && attacking == false) animationFrame++;                  
                     else if (animationFrame < 4 && attacking == true) animationFrame++;                  
-                    else animationFrame = 0;
-                    
+                    else animationFrame = 0;                    
                     animationTimer = 0;
                 }
             }

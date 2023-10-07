@@ -12,6 +12,8 @@ namespace Project
 {
     public class Dragon : Person
     {
+        SpriteFont Font;
+
         /// <summary>
         /// how long it takes to attack
         /// </summary>
@@ -20,10 +22,10 @@ namespace Project
         /// <summary>
         /// the texture of the dragon and animation frame
         /// </summary>
-        private Texture2D texture;
         private int textureRow;
         private int textureCol = 1;
 
+        private Texture2D healthTexture;
 
         public override int Health { get; set; }
 
@@ -41,7 +43,8 @@ namespace Project
 
         public Dragon(ContentManager c, int Team)
         {
-            Health = 20;
+            Font = c.Load<SpriteFont>("bangers");
+            Health = 48;
             Speed = 10;
             Damage = 10;
             Armor = 3;
@@ -50,6 +53,7 @@ namespace Project
             this.team = Team;
             bounds = new BoundingRectangle(Position, 144, 100);
             texture = c.Load<Texture2D>("flying_dragon-red");
+            healthTexture = c.Load<Texture2D>("HealthBar");
         }
 
         public override void Attack(Person other)
@@ -93,13 +97,17 @@ namespace Project
             {
                 if (team == 1) s.Draw(texture, Position, source, Color.White, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 0);
                 if (team == -1) s.Draw(texture, Position, source, Color.White, 0, new Vector2(0, 0), 1f, SpriteEffects.FlipHorizontally, 0);
+
+                Rectangle ss = new Rectangle( 0 , (int)(Health / 6 * 6), 17 , 6 );                
+                Vector2 healtbarpos = Position + new Vector2(20, 6);
+                s.Draw(healthTexture, healtbarpos , ss ,Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0);
+                //s.DrawString(Font, $"{this.Health}", new Vector2(200, 200), Color.Black);
             }
-//            s.Draw(texture, new Rectangle((int)Position.X, (int)Position.Y, (int)bounds.X, (int)bounds.Y), new Rectangle(0,0,144,128),  Color.Green);
         }
 
         public override void Update(GameTime gT)
         {
-            
+            if (Health <= 0) IsAlive = false;
             Move(gT);
             bounds.X = Position.X;
             bounds.Y = Position.Y;

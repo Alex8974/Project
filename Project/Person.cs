@@ -12,12 +12,27 @@ namespace Project
 {
     public abstract class Person
     {
+        /// <summary>
+        /// the time between each animaitons
+        /// </summary>
         protected const float ANIMATION_TIMER = 0.1f;
         protected int size = 16;
         public SpriteSheetPicker frameRow = SpriteSheetPicker.WalkingRight;
+
+        /// <summary>
+        /// the frame the animaiton is on col
+        /// </summary>
         protected int animationFrame = 0;
+
+        /// <summary>
+        /// the current time between the animations
+        /// </summary>
         protected double animationTimer;
 
+        /// <summary>
+        /// the texture for the sprite
+        /// </summary>
+        protected Texture2D texture;
         /// <summary>
         /// if the person is attacking
         /// </summary>

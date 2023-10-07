@@ -21,7 +21,6 @@ namespace Project
     public class SwordsMan : Person
     {
         //the texture
-        public Texture2D texture;
         private Random r = new Random();
         private SoundEffect swordSlash;
 

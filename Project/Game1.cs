@@ -12,6 +12,7 @@ using Microsoft.Xna.Framework.Media;
 using Microsoft.Xna.Framework.Audio;
 using Project.Screens;
 using SharpDX.Direct3D9;
+using ParticleSystemExample;
 //using System.Windows.Forms;
 
 namespace Project
@@ -42,10 +43,11 @@ namespace Project
         private List<Person> Team2 = new List<Person>();
 
         private World world;
-
+        private ExplosionParticleSystem _explosion;
 
         public Game1()
         {
+            _explosion = new ExplosionParticleSystem(this, 20);
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
@@ -78,6 +80,7 @@ namespace Project
         {
             // TODO: Add your initialization logic here
             startScreen.Initilze(Content);
+            Components.Add(_explosion);
 
             base.Initialize();
         }
@@ -179,6 +182,7 @@ namespace Project
                     {
                         Team2.Add(new SwordsMan(Content, "Team2"));
                         summontime = 0;
+                        _explosion.PlaceExplosion(new Vector2(200, 400));
                     }
                     else summontime += gameTime.ElapsedGameTime.TotalSeconds;
 
