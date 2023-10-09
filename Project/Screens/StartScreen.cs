@@ -41,6 +41,7 @@ namespace Project.Screens
             sb.Draw(texture, new Vector2(0, 0), Color.White);
             sb.DrawString(f, "Castle Crusaders", new Vector2(250, 150), Color.Black);
             sb.DrawString(f, "Press 'Enter' to start", new Vector2(300, 200), Color.Black, 0, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0);
+            sb.DrawString(f, "Press 'C' to view controls", new Vector2(280, 220), Color.Black, 0, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0);
             foreach (Person p in StartscreenTeam) p.Draw(sb, gameTime);
         }
     }

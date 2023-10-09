@@ -275,12 +275,6 @@ namespace Project
                 _spriteBatch.Draw(backgoundTexture, new Vector2(0, 0), Color.White);
                 timer -= gameTime.ElapsedGameTime.TotalSeconds ;
 
-                if(Team1.Count == 0)
-                {
-                    _spriteBatch.DrawString(font, "Press (A) to summon", new Vector2(307, 100), Color.Black, 0, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0);
-                    _spriteBatch.DrawString(font, "Press (P) to Pause", new Vector2(320, 125), Color.Black, 0, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0);
-
-                }
                 if (gameScreens == GameScreens.Pause) pauseScreen.Draw(gameTime, _spriteBatch, font);
 
                 foreach (Person p in Team1) p.Draw(_spriteBatch, gameTime);
