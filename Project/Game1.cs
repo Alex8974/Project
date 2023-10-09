@@ -35,6 +35,7 @@ namespace Project
         double cooldown = 4;
 
         private StartScreen startScreen;
+        private ControlScreen controlScreen;
         private PauseScreen pauseScreen;
         private WinLoseScreen winLoseScreen;
 
@@ -66,6 +67,7 @@ namespace Project
             };
 
             startScreen = new StartScreen();
+            controlScreen = new ControlScreen();
             pauseScreen = new PauseScreen();
             winLoseScreen = new WinLoseScreen();
 
@@ -80,6 +82,7 @@ namespace Project
         {
             // TODO: Add your initialization logic here
             startScreen.Initilze(Content);
+            controlScreen.Initilze(Content);
             Components.Add(_explosion);
 
             base.Initialize();
@@ -118,11 +121,19 @@ namespace Project
 
             if(gameScreens == GameScreens.Start)
             {
-                if(startScreen.Update(gameTime, keyboardState) != GameScreens.Start)
+                if(startScreen.Update(gameTime, keyboardState) == GameScreens.Running)
                 {
                     gameScreens = GameScreens.Running;
                     MediaPlayer.Stop();
                     MediaPlayer.Play(song2);
+                }
+                if (startScreen.Update(gameTime, keyboardState) == GameScreens.Controls) gameScreens = GameScreens.Controls;
+            }
+            else if(gameScreens == GameScreens.Controls)
+            {
+                if (controlScreen.Update(gameTime, keyboardState) != GameScreens.Controls)
+                {
+                    gameScreens = GameScreens.Start;
                 }
             }
             else
@@ -192,7 +203,7 @@ namespace Project
                     //    Team2.Add(new SwordsMan(Content, "Team2"));
                     //}
 
-                    if (keyboardState.IsKeyDown(Keys.Q) && !prevkeyboardState.IsKeyDown(Keys.Q))
+                    if (keyboardState.IsKeyDown(Keys.S) && !prevkeyboardState.IsKeyDown(Keys.S))
                     {
                         Team1.Add(new Archer(Content, "Team1"));
                     }
@@ -255,7 +266,11 @@ namespace Project
             {
                 startScreen.Draw(gameTime, _spriteBatch, font, backgoundTexture);
             }
-            if(gameScreens == GameScreens.Running || gameScreens == GameScreens.Pause)
+            else if(gameScreens == GameScreens.Controls)
+            {
+                controlScreen.Draw(gameTime, _spriteBatch, font, backgoundTexture);
+            }
+            else if(gameScreens == GameScreens.Running || gameScreens == GameScreens.Pause)
             {
                 _spriteBatch.Draw(backgoundTexture, new Vector2(0, 0), Color.White);
                 timer -= gameTime.ElapsedGameTime.TotalSeconds ;

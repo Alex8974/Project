@@ -47,6 +47,9 @@ namespace Project
 
         private ExplosionParticleSystem _explosion;
 
+        private double fazeTimer = 0;
+        private int faze = 0;
+
 
         public Dragon(ContentManager c, int Team, ExplosionParticleSystem _explosion)
         {
@@ -69,40 +72,56 @@ namespace Project
 
         public override void Attack(Person other)
         {
-            attacking = true;
+            other.Health -= (this.Damage - other.Armor);
+            attacking = false;
+        }
 
-            if(AttackCoolDown > AttackTime)
+        private void attackingPhase(List<Person> other)
+        {
+            attacking = true;
+            if (fazeTimer > 0.25f && faze < 10)
             {
-                Vector2 attackSpot = new Vector2(attackbounds.X + 5, attackbounds.Y + 8);
-                _explosion.PlaceExplosion(attackSpot);
-                attackSpot.Y -= 8;
-                attackSpot.X += 4;
-                _explosion.PlaceExplosion(attackSpot);
-                attackSpot.Y -= 16;
-                _explosion.PlaceExplosion(attackSpot);
-                attackSpot.Y -= 16;
-                _explosion.PlaceExplosion(attackSpot);
-                AttackCoolDown = 0;
-                other.Health -= this.Damage;
-            }            
+                Vector2 place = new Vector2(Position.X + 20 - (faze * 1), Position.Y + 70 + (faze * 8));
+                _explosion.PlaceExplosion(place);
+                fazeTimer = 0;
+                faze++;
+            }
+            else if (fazeTimer > 0.25f && faze >= 10) 
+            {
+                Person holdp = null;
+                bool hold = false;
+                foreach (var p in other)
+                {
+                    hold = CollisionHelper.Collides(AttackBounds, p.Bounds);
+                    holdp = p;
+                    if (hold) break;
+                }
+                if (holdp != null) Attack(holdp);
+                faze = 0; 
+            }
+            
         }
 
         public override void CheckForAttack(List<Person> otherp)
         {
-            Person holdp = null;
-            bool hold = false;
-            foreach (var p in otherp)
+            if (attacking == false)
             {
-                hold = CollisionHelper.Collides(AttackBounds, p.Bounds);
-                holdp = p;
-                if (hold) break;
+                
+                bool hold = false;
+                foreach (var p in otherp)
+                {
+                    hold = CollisionHelper.Collides(AttackBounds, p.Bounds);
+                    if (hold) break;
+                }
+                if (hold == true)
+                {
+                    attackingPhase(otherp);
+                    Speed = 0;
+                }
+                else attacking = false;
             }
-            if (hold == true)
-            {
-                Attack(holdp);
-                Speed = 0;
-            }
-            else attacking = false;
+            if (attacking == true) attackingPhase(otherp);
+            
         }
 
         public override void Draw(SpriteBatch s, GameTime gT)
@@ -146,6 +165,7 @@ namespace Project
 
         public override void Update(GameTime gT)
         {
+
             if (Health <= 0) IsAlive = false;
             if (attacking == false) 
             {
@@ -153,6 +173,7 @@ namespace Project
                 Move(gT); 
             }
 
+            this.fazeTimer += gT.ElapsedGameTime.TotalSeconds;
             this.AttackCoolDown += gT.ElapsedGameTime.TotalSeconds;
             bounds.X = Position.X;
             bounds.Y = Position.Y;

@@ -29,6 +29,10 @@ namespace Project.Screens
             {
                 return GameScreens.Running;
             }
+            else if (keyboardState.IsKeyDown(Keys.C))
+            {
+                return GameScreens.Controls;
+            }
             else return GameScreens.Start;
         }
 

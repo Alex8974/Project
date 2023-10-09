@@ -12,6 +12,7 @@ namespace Project
         Running,
         Pause,
         Win,
-        Lose
+        Lose,
+        Controls
     }
 }
