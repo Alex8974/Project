@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using ParticleSystemExample;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,7 +42,13 @@ namespace Project
         private BoundingRectangle bounds;
         public override BoundingRectangle Bounds { get { return bounds; } }
 
-        public Dragon(ContentManager c, int Team)
+        private BoundingRectangle attackbounds;
+        public BoundingRectangle AttackBounds { get { return attackbounds; } }
+
+        private ExplosionParticleSystem _explosion;
+
+
+        public Dragon(ContentManager c, int Team, ExplosionParticleSystem _explosion)
         {
             Font = c.Load<SpriteFont>("bangers");
             Health = 48;
@@ -54,16 +61,48 @@ namespace Project
             bounds = new BoundingRectangle(Position, 144, 100);
             texture = c.Load<Texture2D>("flying_dragon-red");
             healthTexture = c.Load<Texture2D>("HealthBar");
+            attackbounds = new BoundingRectangle(Position, 16, 16);
+            attackbounds.Y = 328;
+            this._explosion = _explosion;
+            AttackTime = 3;
         }
 
         public override void Attack(Person other)
         {
-            throw new NotImplementedException();
+            attacking = true;
+
+            if(AttackCoolDown > AttackTime)
+            {
+                Vector2 attackSpot = new Vector2(attackbounds.X + 5, attackbounds.Y + 8);
+                _explosion.PlaceExplosion(attackSpot);
+                attackSpot.Y -= 8;
+                attackSpot.X += 4;
+                _explosion.PlaceExplosion(attackSpot);
+                attackSpot.Y -= 16;
+                _explosion.PlaceExplosion(attackSpot);
+                attackSpot.Y -= 16;
+                _explosion.PlaceExplosion(attackSpot);
+                AttackCoolDown = 0;
+                other.Health -= this.Damage;
+            }            
         }
 
         public override void CheckForAttack(List<Person> otherp)
         {
-            //throw new NotImplementedException();
+            Person holdp = null;
+            bool hold = false;
+            foreach (var p in otherp)
+            {
+                hold = CollisionHelper.Collides(AttackBounds, p.Bounds);
+                holdp = p;
+                if (hold) break;
+            }
+            if (hold == true)
+            {
+                Attack(holdp);
+                Speed = 0;
+            }
+            else attacking = false;
         }
 
         public override void Draw(SpriteBatch s, GameTime gT)
@@ -108,9 +147,16 @@ namespace Project
         public override void Update(GameTime gT)
         {
             if (Health <= 0) IsAlive = false;
-            Move(gT);
+            if (attacking == false) 
+            {
+                Speed = 10;
+                Move(gT); 
+            }
+
+            this.AttackCoolDown += gT.ElapsedGameTime.TotalSeconds;
             bounds.X = Position.X;
             bounds.Y = Position.Y;
+            attackbounds.X = Position.X;
         }
     }
 }

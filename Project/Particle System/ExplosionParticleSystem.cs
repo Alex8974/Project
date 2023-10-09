@@ -29,7 +29,7 @@ namespace ParticleSystemExample
 
         protected override void InitializeParticle(ref Particle p, Vector2 where)
         {
-            var velocity = RandomHelper.NextDirection() * RandomHelper.NextFloat(10, 40);
+            var velocity = RandomHelper.NextDirection() * RandomHelper.NextFloat(0.1f, 0.5f);
 
             var lifetime = RandomHelper.NextFloat(0.5f, 1.0f);
 
@@ -39,7 +39,7 @@ namespace ParticleSystemExample
 
             var angularVelocity = RandomHelper.NextFloat(-MathHelper.PiOver2, MathHelper.PiOver4);
 
-            p.Initialize(where, velocity, acceleration, lifetime: lifetime, rotation: rotation, angularVelocity: angularVelocity);
+            p.Initialize(where, velocity / 4, acceleration/4, lifetime: lifetime, rotation: rotation, angularVelocity: angularVelocity);
         }
 
         protected override void UpdateParticle(ref Particle particle, float dt)
@@ -52,7 +52,7 @@ namespace ParticleSystemExample
 
             particle.Color = Color.White * alpha;
 
-            particle.Scale = .1f + .25f * normalizedLifeTime;
+            particle.Scale = .1f + .025f * normalizedLifeTime;
         }
 
         public void PlaceExplosion(Vector2 where) => AddParticles(where);
