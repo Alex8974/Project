@@ -31,24 +31,31 @@ namespace Project
         private SoundEffect swordSlash;
         Texture2D backgoundTexture;
         double timer = 260;
+        //double timer = 20; //test line of code
         double summontime = 0;
         double cooldown = 4;
+        
+        #region the screens
 
         private StartScreen startScreen;
         private ControlScreen controlScreen;
         private PauseScreen pauseScreen;
         private WinLoseScreen winLoseScreen;
 
-        
+        #endregion
+
+
         private List<Person> Team1 = new List<Person>();
         private List<Person> Team2 = new List<Person>();
 
         private World world;
         private ExplosionParticleSystem _explosion;
+        private FireworkParticleSystem _fireworks;
 
         public Game1()
         {
             _explosion = new ExplosionParticleSystem(this, 20);
+            _fireworks = new FireworkParticleSystem(this, 1000);
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
@@ -84,6 +91,7 @@ namespace Project
             startScreen.Initilze(Content);
             controlScreen.Initilze(Content);
             Components.Add(_explosion);
+            Components.Add(_fireworks);
 
             base.Initialize();
         }
@@ -110,7 +118,7 @@ namespace Project
             if (winloss[1]) gameScreens = GameScreens.Lose;
             if(gameScreens == GameScreens.Win || gameScreens == GameScreens.Lose)
             {
-                 if(winLoseScreen.Update(gameTime, keyboardState)) Exit();
+                 if(winLoseScreen.Update(gameTime, keyboardState, _fireworks)) Exit();
             }
 
             #endregion
@@ -129,13 +137,9 @@ namespace Project
                 }
                 if (startScreen.Update(gameTime, keyboardState) == GameScreens.Controls) gameScreens = GameScreens.Controls;
             }
-            else if(gameScreens == GameScreens.Controls)
-            {
-                if (controlScreen.Update(gameTime, keyboardState) != GameScreens.Controls)
-                {
-                    gameScreens = GameScreens.Start;
-                }
-            }
+
+            else if(gameScreens == GameScreens.Controls) { if (controlScreen.Update(gameTime, keyboardState) != GameScreens.Controls) { gameScreens = GameScreens.Start; } }
+
             else
             {
                 if (gameScreens == GameScreens.Pause)
@@ -194,7 +198,6 @@ namespace Project
                     {
                         Team2.Add(new SwordsMan(Content, "Team2"));
                         summontime = 0;
-                        _explosion.PlaceExplosion(new Vector2(200, 400));
                     }
                     else summontime += gameTime.ElapsedGameTime.TotalSeconds;
 
@@ -240,8 +243,6 @@ namespace Project
                     }
                 }
             }
-            
-
             base.Update(gameTime);
         }
 
@@ -261,15 +262,10 @@ namespace Project
             }
             #endregion
 
+            if (gameScreens == GameScreens.Start) startScreen.Draw(gameTime, _spriteBatch, font, backgoundTexture);
 
-            if (gameScreens == GameScreens.Start)
-            {
-                startScreen.Draw(gameTime, _spriteBatch, font, backgoundTexture);
-            }
-            else if(gameScreens == GameScreens.Controls)
-            {
-                controlScreen.Draw(gameTime, _spriteBatch, font, backgoundTexture);
-            }
+            else if(gameScreens == GameScreens.Controls) controlScreen.Draw(gameTime, _spriteBatch, font, backgoundTexture);
+            
             else if(gameScreens == GameScreens.Running || gameScreens == GameScreens.Pause)
             {
                 _spriteBatch.Draw(backgoundTexture, new Vector2(0, 0), Color.White);
