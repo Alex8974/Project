@@ -50,15 +50,16 @@ namespace Project
         {
 
             Position += delta;
-
-            float leftSideOfScreen = Position.X - (viewport.Width / 2/ Scale);
-            float rightSideOfScreen = Position.X + (viewport.Width / 2 / Scale);
+            float SideofScreen;
+            if (Position.X <= viewport.Width / 2) SideofScreen = Position.X - (viewport.Width / 2/ Scale);
+            else SideofScreen = Position.X + (viewport.Width / 2 / Scale);
             float TopOfScreen = Position.Y - (viewport.Height / 2 / Scale);
             float BottomOfScreen = Position.Y + (viewport.Height / 2 / Scale);
 
-            float holdx = MathHelper.Clamp(leftSideOfScreen, 0, 800);
+            float holdx = MathHelper.Clamp(SideofScreen, 0, 800);
             float holdy = MathHelper.Clamp(BottomOfScreen, 0, 480);
-            Position = new Vector2(holdx + (viewport.Width / 2 / Scale), holdy - (viewport.Height / 2 / Scale));
+            if(Position.X <= viewport.Width / 2) Position = new Vector2(holdx + (viewport.Width / 2 / Scale), holdy - (viewport.Height / 2 / Scale));
+            else Position = new Vector2(holdx - (viewport.Width / 2 / Scale), holdy - (viewport.Height / 2 / Scale));
         }
 
         public void Center(Viewport viewport)

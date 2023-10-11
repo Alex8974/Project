@@ -40,7 +40,9 @@ namespace Project.Screens
             sb.DrawString(f, "Press (A) to summon a swordsman", new Vector2(50, 100), Color.White, 0, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0);
             sb.DrawString(f, "Press (S) to summon a archer", new Vector2(50, 140), Color.White, 0, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0);
             sb.DrawString(f, "Press (P) to pause the game", new Vector2(50, 180), Color.White, 0, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0);
-            sb.DrawString(f, "Press (E) to return to start menu", new Vector2(50, 220), Color.White, 0, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0);
+            sb.DrawString(f, "Press (Z) to zoom in", new Vector2(50, 220), Color.White, 0, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0);
+            sb.DrawString(f, "Press (X) to zoom out", new Vector2(50, 260), Color.White, 0, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0);
+            sb.DrawString(f, "Press (E) to return to start menu", new Vector2(50, 300), Color.White, 0, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0);
             foreach (Person p in ControlScreenTeam) p.Draw(sb, gameTime);
         }
     }

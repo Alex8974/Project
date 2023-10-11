@@ -138,15 +138,14 @@ namespace Project
                 if (camera.Position.Y > Team1[0].Position.Y) camera.Move(new Vector2(0, -1));
                 else if (camera.Position.Y < Team1[0].Position.Y) camera.Move(new Vector2(0, 1));
             }
-            else if(Team1.Count == 0)
+            else if(Team1.Count == 0 && Team2.Count != 0)
             {
-                camera.Center(GraphicsDevice.Viewport);
-                if (cameraZoom > 3)
-                {
-                    camera.ZoomOut(0.1f);
-                    cameraZoom = 0;
-                }
-                else cameraZoom++; ;
+                if (camera.Position.X > Team2[0].Position.X)
+                    camera.Move(new Vector2(-1, 0));
+                else if (camera.Position.X < Team2[0].Position.X)
+                    camera.Move(new Vector2(1, 0));
+                if (camera.Position.Y > Team2[0].Position.Y) camera.Move(new Vector2(0, -1));
+                else if (camera.Position.Y < Team2[0].Position.Y) camera.Move(new Vector2(0, 1));
             }
                 #endregion
 
