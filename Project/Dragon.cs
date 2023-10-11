@@ -128,7 +128,6 @@ namespace Project
         {
             Rectangle source = new Rectangle(textureRow *144 , (int)textureCol * 128, 144, 128);
             animationTimer += gT.ElapsedGameTime.TotalSeconds;
-
             if ((int)frameRow > 3)
             {
                 if (animationTimer > 0.2f)

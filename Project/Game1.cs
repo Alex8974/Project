@@ -13,6 +13,7 @@ using Microsoft.Xna.Framework.Audio;
 using Project.Screens;
 //using SharpDX.Direct3D9;
 using ParticleSystemExample;
+using SharpDX.MediaFoundation;
 //using System.Windows.Forms;
 
 namespace Project
@@ -52,8 +53,9 @@ namespace Project
         private ExplosionParticleSystem _explosion;
         private FireworkParticleSystem _fireworks;
 
-        private float scale = 1.0f; // Initial scale
-        private float minScale = 1.0f; // Minimum scale to prevent zooming out too far
+
+        private Camera camera;
+        int cameraZoom = 0;
 
         public Game1()
         {
@@ -91,6 +93,7 @@ namespace Project
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
+            camera = new Camera(GraphicsDevice.Viewport);
             startScreen.Initilze(Content);
             controlScreen.Initilze(Content);
             Components.Add(_explosion);
@@ -114,37 +117,42 @@ namespace Project
         protected override void Update(GameTime gameTime)
         {
             #region zoom
-            //if (keyboardState.IsKeyDown(Keys.Z))
-            //{
-            //    scale *= 1.1f; // Adjust the zoom factor as needed
+            if (keyboardState.IsKeyDown(Keys.Z))
+            {
+                camera.ZoomIn(1.05f);
+            }
 
-               
-            //    if (Team1[0] != null)
-            //    {
-            //        Vector2 viewportCenter = new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
-            //        Vector2 spriteCenter = Team1[0].Position + new Vector2(32 / 2, 32 / 2); // Adjust for the sprite size
-            //        Vector2 offset = viewportCenter - spriteCenter;
-            //    }
-            //    else
-            //    {
-            //        Vector2 viewportCenter = new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
-            //        Vector2 spriteCenter = new Vector2(50, 328) + new Vector2(32 / 2, 32 / 2); // Adjust for the sprite size
-            //        Vector2 offset = viewportCenter - spriteCenter;
-            //    }
-                
-            //}
+            // Zoom out with the 'X' key
+            if (keyboardState.IsKeyDown(Keys.X))
+            {
+                camera.ZoomOut(1.1f);
+            }
 
-            //// Zoom out with the 'X' key
-            //if (keyboardState.IsKeyDown(Keys.X))
-            //{
-            //    scale /= 1.1f; // Adjust the zoom factor as needed
-            //    scale = Math.Max(scale, minScale); // Ensure a minimum scale
-            //}
-            #endregion
+            camera.UpdateTransform(GraphicsDevice.Viewport);
+            if(Team1.Count > 0)
+            {
+                if (camera.Position.X > Team1[0].Position.X) 
+                    camera.Move(new Vector2(-1, 0));
+                else if (camera.Position.X < Team1[0].Position.X) 
+                    camera.Move(new Vector2(1, 0));
+                if (camera.Position.Y > Team1[0].Position.Y) camera.Move(new Vector2(0, -1));
+                else if (camera.Position.Y < Team1[0].Position.Y) camera.Move(new Vector2(0, 1));
+            }
+            else if(Team1.Count == 0)
+            {
+                camera.Center(GraphicsDevice.Viewport);
+                if (cameraZoom > 3)
+                {
+                    camera.ZoomOut(0.1f);
+                    cameraZoom = 0;
+                }
+                else cameraZoom++; ;
+            }
+                #endregion
 
-            #region Check for win/loss
+                #region Check for win/loss
 
-            bool[] winloss = winLoseScreen.CheckforWin(Team1, Team2);
+                bool[] winloss = winLoseScreen.CheckforWin(Team1, Team2);
             if (winloss[0] || timer < 0) gameScreens = GameScreens.Win;
             if (winloss[1]) gameScreens = GameScreens.Lose;
             if(gameScreens == GameScreens.Win || gameScreens == GameScreens.Lose)
@@ -287,6 +295,7 @@ namespace Project
 
         protected override void Draw(GameTime gameTime)
         {
+            #region test transform
             float player;
             float offsetx;
             if (Team1.Count > 0 && Team1[0] != null) { 
@@ -301,12 +310,15 @@ namespace Project
             
             Matrix transform;
 
-            transform = Matrix.CreateTranslation(offsetx * 0.333f, 0, 0);
+            //transform = Matrix.CreateTranslation(offsetx * 0.333f, 0, 0);
+
+            // Matrix combinedTransform = transform * camera.Transform;
+            #endregion
 
             GraphicsDevice.Clear(Color.Black);
 
             //_spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, null, null, null, Matrix.CreateScale(scale));
-            _spriteBatch.Begin(transformMatrix: transform);
+            _spriteBatch.Begin(transformMatrix: camera.Transform);
 
             #region The win / lose section
             if (gameScreens == GameScreens.Win || gameScreens == GameScreens.Lose)
