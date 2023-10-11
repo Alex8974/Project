@@ -11,7 +11,7 @@ using System.Xml.Schema;
 using Microsoft.Xna.Framework.Media;
 using Microsoft.Xna.Framework.Audio;
 using Project.Screens;
-using SharpDX.Direct3D9;
+//using SharpDX.Direct3D9;
 using ParticleSystemExample;
 //using System.Windows.Forms;
 
@@ -51,6 +51,9 @@ namespace Project
         private World world;
         private ExplosionParticleSystem _explosion;
         private FireworkParticleSystem _fireworks;
+
+        private float scale = 1.0f; // Initial scale
+        private float minScale = 1.0f; // Minimum scale to prevent zooming out too far
 
         public Game1()
         {
@@ -110,6 +113,34 @@ namespace Project
 
         protected override void Update(GameTime gameTime)
         {
+            #region zoom
+            //if (keyboardState.IsKeyDown(Keys.Z))
+            //{
+            //    scale *= 1.1f; // Adjust the zoom factor as needed
+
+               
+            //    if (Team1[0] != null)
+            //    {
+            //        Vector2 viewportCenter = new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
+            //        Vector2 spriteCenter = Team1[0].Position + new Vector2(32 / 2, 32 / 2); // Adjust for the sprite size
+            //        Vector2 offset = viewportCenter - spriteCenter;
+            //    }
+            //    else
+            //    {
+            //        Vector2 viewportCenter = new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
+            //        Vector2 spriteCenter = new Vector2(50, 328) + new Vector2(32 / 2, 32 / 2); // Adjust for the sprite size
+            //        Vector2 offset = viewportCenter - spriteCenter;
+            //    }
+                
+            //}
+
+            //// Zoom out with the 'X' key
+            //if (keyboardState.IsKeyDown(Keys.X))
+            //{
+            //    scale /= 1.1f; // Adjust the zoom factor as needed
+            //    scale = Math.Max(scale, minScale); // Ensure a minimum scale
+            //}
+            #endregion
 
             #region Check for win/loss
 
@@ -127,7 +158,9 @@ namespace Project
             keyboardState = Keyboard.GetState();
             // TODO: Add your update logic here
 
-            if(gameScreens == GameScreens.Start)
+            #region start screen
+
+            if (gameScreens == GameScreens.Start)
             {
                 if(startScreen.Update(gameTime, keyboardState) == GameScreens.Running)
                 {
@@ -137,8 +170,11 @@ namespace Project
                 }
                 if (startScreen.Update(gameTime, keyboardState) == GameScreens.Controls) gameScreens = GameScreens.Controls;
             }
+            #endregion
 
-            else if(gameScreens == GameScreens.Controls) { if (controlScreen.Update(gameTime, keyboardState) != GameScreens.Controls) { gameScreens = GameScreens.Start; } }
+            else if (gameScreens == GameScreens.Controls) { if (controlScreen.Update(gameTime, keyboardState) != GameScreens.Controls) { gameScreens = GameScreens.Start; } }
+
+            #region running / pause screen
 
             else
             {
@@ -150,7 +186,7 @@ namespace Project
 
                 if (gameScreens == GameScreens.Running)
                 {
-                    #region new attack 
+                    #region cheking for attack 
 
                 for (int i = 0; i < Math.Max(Team1.Count, Team2.Count); i++)
                 {
@@ -243,15 +279,34 @@ namespace Project
                     }
                 }
             }
+
+            #endregion
+
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
         {
+            float player;
+            float offsetx;
+            if (Team1.Count > 0 && Team1[0] != null) { 
+                player = MathHelper.Clamp(Team1[0].Position.X, 300, 500);
+                offsetx = 300 - player;
+            }
+            else
+            { 
+                player = MathHelper.Clamp(50, 300, 500);
+                offsetx = 300 - player;
+            }
             
+            Matrix transform;
+
+            transform = Matrix.CreateTranslation(offsetx * 0.333f, 0, 0);
+
             GraphicsDevice.Clear(Color.Black);
 
-            _spriteBatch.Begin();
+            //_spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, null, null, null, Matrix.CreateScale(scale));
+            _spriteBatch.Begin(transformMatrix: transform);
 
             #region The win / lose section
             if (gameScreens == GameScreens.Win || gameScreens == GameScreens.Lose)

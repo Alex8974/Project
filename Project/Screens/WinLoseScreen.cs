@@ -23,6 +23,7 @@ namespace Project.Screens
             if(timer > 0.5f)
             {
                 _fireworks.PlaceFireWork(new Vector2(RandomHelper.Next(10, 700), RandomHelper.Next(10, 400)));
+                timer = 0;
             }
             if (keyboardState.IsKeyDown(Keys.Escape)) return true;
             else return false;
