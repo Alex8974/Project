@@ -12,10 +12,28 @@ namespace Project.Screens
 {
     public class WinLoseScreen
     {
+        /// <summary>
+        /// if win true
+        /// </summary>
         bool win;
+
+        /// <summary>
+        /// if lose true
+        /// </summary>
         bool lose;
+
+        /// <summary>
+        /// the timer for the fireworks
+        /// </summary>
         double timer = 0;
 
+        /// <summary>
+        /// updates the win loss screen when it is active 
+        /// </summary>
+        /// <param name="gameTime">the game time</param>
+        /// <param name="keyboardState">the current keboardState</param>
+        /// <param name="_fireworks">the fireworks</param>
+        /// <returns></returns>
         public bool Update(GameTime gameTime, KeyboardState keyboardState, FireworkParticleSystem _fireworks)
         {
             timer += gameTime.ElapsedGameTime.TotalSeconds;
@@ -31,6 +49,12 @@ namespace Project.Screens
 
         }
 
+        /// <summary>
+        /// checks to see if someone has won or lost 
+        /// </summary>
+        /// <param name="team1">the player's team</param>
+        /// <param name="team2">the "ai" team </param>
+        /// <returns></returns>
         public bool[] CheckforWin(List<Person> team1, List<Person> team2)
         {
             bool[] winLoss = new bool[2];

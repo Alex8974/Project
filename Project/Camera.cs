@@ -51,15 +51,34 @@ namespace Project
 
             Position += delta;
             float SideofScreen;
+            float topbottomScreen;
             if (Position.X <= viewport.Width / 2) SideofScreen = Position.X - (viewport.Width / 2/ Scale);
             else SideofScreen = Position.X + (viewport.Width / 2 / Scale);
-            float TopOfScreen = Position.Y - (viewport.Height / 2 / Scale);
-            float BottomOfScreen = Position.Y + (viewport.Height / 2 / Scale);
+
+            if (Position.Y <= viewport.Height / 2) topbottomScreen = Position.Y - (viewport.Height / 2 / Scale);
+            else topbottomScreen = Position.Y + (viewport.Height / 2 / Scale);
+
+            //float TopOfScreen = Position.Y - (viewport.Height / 2 / Scale);
+            //float BottomOfScreen = Position.Y + (viewport.Height / 2 / Scale);
 
             float holdx = MathHelper.Clamp(SideofScreen, 0, 800);
-            float holdy = MathHelper.Clamp(BottomOfScreen, 0, 480);
-            if(Position.X <= viewport.Width / 2) Position = new Vector2(holdx + (viewport.Width / 2 / Scale), holdy - (viewport.Height / 2 / Scale));
-            else Position = new Vector2(holdx - (viewport.Width / 2 / Scale), holdy - (viewport.Height / 2 / Scale));
+            float holdy = MathHelper.Clamp(topbottomScreen, 0, 480);
+            //if (Position.X <= viewport.Width / 2)
+            //    Position = new Vector2(holdx + (viewport.Width / 2 / Scale), holdy + (viewport.Height / 2 / Scale));
+            //else
+            //    Position = new Vector2(holdx - (viewport.Width / 2 / Scale), holdy + (viewport.Height / 2 / Scale));
+
+            if (Position.X <= viewport.Width / 2)
+            {
+                if (Position.Y <= viewport.Height / 2) Position = new Vector2(holdx + (viewport.Width / 2 / Scale), holdy + (viewport.Height / 2 / Scale));
+                else Position = new Vector2(holdx + (viewport.Width / 2 / Scale), holdy - (viewport.Height / 2 / Scale));
+            }
+            else
+            {
+                if (Position.Y <= viewport.Height / 2) Position = new Vector2(holdx - (viewport.Width / 2 / Scale), holdy + (viewport.Height / 2 / Scale));
+                else Position = new Vector2(holdx - (viewport.Width / 2 / Scale), holdy - (viewport.Height / 2 / Scale));
+            }
+                
         }
 
         public void Center(Viewport viewport)
