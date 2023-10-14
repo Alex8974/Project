@@ -12,6 +12,9 @@ namespace Project.Screens
 {
     public class ControlScreen
     {
+        /// <summary>
+        /// the controlls team for a visiual
+        /// </summary>
         private List<Person> ControlScreenTeam = new List<Person>();
 
         public void Initilze(ContentManager c)
@@ -42,7 +45,8 @@ namespace Project.Screens
             sb.DrawString(f, "Press (P) to pause the game", new Vector2(50, 180), Color.White, 0, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0);
             sb.DrawString(f, "Press (Z) to zoom in", new Vector2(50, 220), Color.White, 0, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0);
             sb.DrawString(f, "Press (X) to zoom out", new Vector2(50, 260), Color.White, 0, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0);
-            sb.DrawString(f, "Press (E) to return to start menu", new Vector2(50, 300), Color.White, 0, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0);
+            sb.DrawString(f, "Use the arrow keys to move screen while zoomed in", new Vector2(50, 300), Color.White, 0, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0);
+            sb.DrawString(f, "Press (E) to return to start menu", new Vector2(50, 340), Color.White, 0, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0);
             foreach (Person p in ControlScreenTeam) p.Draw(sb, gameTime);
         }
     }

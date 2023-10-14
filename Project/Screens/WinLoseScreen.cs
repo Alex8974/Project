@@ -38,7 +38,7 @@ namespace Project.Screens
         {
             timer += gameTime.ElapsedGameTime.TotalSeconds;
             
-            if(timer > 0.5f)
+            if(timer > 0.25f)
             {
                 _fireworks.PlaceFireWork(new Vector2(RandomHelper.Next(10, 700), RandomHelper.Next(10, 400)));
                 timer = 0;

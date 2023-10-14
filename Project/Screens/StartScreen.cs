@@ -13,6 +13,9 @@ namespace Project.Screens
 {
     public class StartScreen
     {
+        /// <summary>
+        /// the team to draw the starting people
+        /// </summary>
         private List<Person> StartscreenTeam = new List<Person>();
 
         public void Initilze(ContentManager c)

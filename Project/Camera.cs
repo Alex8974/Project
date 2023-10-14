@@ -20,22 +20,21 @@ namespace Project
         public Vector2 Position;
         public float Scale { get; private set; }
 
-        private int backgroundWidth = 800;
-        private int backgroundHeight = 480;
-
-        private Rectangle Bounds;
+        private int backgroundWidth;
+        private int backgroundHeight;
 
         private float minScale = 1.0f;
         private float maxScale = 2.0f;
 
         Viewport viewport;
 
-        public Camera(Viewport viewport)
+        public Camera(Viewport viewport, int width, int height)
         {
             this.viewport = viewport;
             Scale = 1.0f;
             Position = new Vector2(viewport.Width /2, viewport.Height/2);
-            Bounds = new Rectangle(0, 0, backgroundWidth - viewport.Width, backgroundHeight - viewport.Height);
+            backgroundWidth = width;
+            backgroundHeight = height;
             UpdateTransform(viewport);
         }
 
@@ -46,6 +45,10 @@ namespace Project
                         Matrix.CreateTranslation(viewport.Width / 2, viewport.Height / 2, 0);
         }
 
+        /// <summary>
+        /// moves the camera screen
+        /// </summary>
+        /// <param name="delta">how you want the camera to move</param>
         public void Move(Vector2 delta)
         {
 
@@ -58,15 +61,9 @@ namespace Project
             if (Position.Y <= viewport.Height / 2) topbottomScreen = Position.Y - (viewport.Height / 2 / Scale);
             else topbottomScreen = Position.Y + (viewport.Height / 2 / Scale);
 
-            //float TopOfScreen = Position.Y - (viewport.Height / 2 / Scale);
-            //float BottomOfScreen = Position.Y + (viewport.Height / 2 / Scale);
+            float holdx = MathHelper.Clamp(SideofScreen, 0, backgroundWidth);
+            float holdy = MathHelper.Clamp(topbottomScreen, 0, backgroundHeight);
 
-            float holdx = MathHelper.Clamp(SideofScreen, 0, 800);
-            float holdy = MathHelper.Clamp(topbottomScreen, 0, 480);
-            //if (Position.X <= viewport.Width / 2)
-            //    Position = new Vector2(holdx + (viewport.Width / 2 / Scale), holdy + (viewport.Height / 2 / Scale));
-            //else
-            //    Position = new Vector2(holdx - (viewport.Width / 2 / Scale), holdy + (viewport.Height / 2 / Scale));
 
             if (Position.X <= viewport.Width / 2)
             {

@@ -93,7 +93,7 @@ namespace Project
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            camera = new Camera(GraphicsDevice.Viewport);
+            camera = new Camera(GraphicsDevice.Viewport, 800, 480);
             startScreen.Initilze(Content);
             controlScreen.Initilze(Content);
             Components.Add(_explosion);
@@ -125,31 +125,36 @@ namespace Project
             // Zoom out with the 'X' key
             if (keyboardState.IsKeyDown(Keys.X))
             {
-                camera.ZoomOut(1.1f);
+                camera.ZoomOut(1.05f);
             }
 
             camera.UpdateTransform(GraphicsDevice.Viewport);
-            if(Team1.Count > 0)
-            {
-                if (camera.Position.X > Team1[0].Position.X) 
-                    camera.Move(new Vector2(-1, 0));
-                else if (camera.Position.X < Team1[0].Position.X) 
-                    camera.Move(new Vector2(1, 0));
-                if (camera.Position.Y > Team1[0].Position.Y) camera.Move(new Vector2(0, -1));
-                else if (camera.Position.Y < Team1[0].Position.Y) camera.Move(new Vector2(0, 1));
-            }
-            else if(Team1.Count == 0 && Team2.Count != 0)
-            {
-                if (camera.Position.X > Team2[0].Position.X)
-                    camera.Move(new Vector2(-1, 0));
-                else if (camera.Position.X < Team2[0].Position.X)
-                    camera.Move(new Vector2(1, 0));
-                if (camera.Position.Y > Team2[0].Position.Y) camera.Move(new Vector2(0, -1));
-                else if (camera.Position.Y < Team2[0].Position.Y) camera.Move(new Vector2(0, 1));
-            }
-                #endregion
+            //if(Team1.Count > 0)
+            //{
+            //    if (camera.Position.X > Team1[0].Position.X) 
+            //        camera.Move(new Vector2(-1, 0));
+            //    else if (camera.Position.X < Team1[0].Position.X) 
+            //        camera.Move(new Vector2(1, 0));
+            //    if (camera.Position.Y > Team1[0].Position.Y) camera.Move(new Vector2(0, -1));
+            //    else if (camera.Position.Y < Team1[0].Position.Y) camera.Move(new Vector2(0, 1));
+            //}
+            //else if(Team1.Count == 0 && Team2.Count != 0)
+            //{
+            //    if (camera.Position.X > Team2[0].Position.X)
+            //        camera.Move(new Vector2(-1, 0));
+            //    else if (camera.Position.X < Team2[0].Position.X)
+            //        camera.Move(new Vector2(1, 0));
+            //    if (camera.Position.Y > Team2[0].Position.Y) camera.Move(new Vector2(0, -1));
+            //    else if (camera.Position.Y < Team2[0].Position.Y) camera.Move(new Vector2(0, 1));
+            //}
 
-                #region Check for win/loss
+            if (keyboardState.IsKeyDown(Keys.Left)) camera.Move(new Vector2(-2, 0));
+            if (keyboardState.IsKeyDown(Keys.Right)) camera.Move(new Vector2(2, 0));
+            if (keyboardState.IsKeyDown(Keys.Up)) camera.Move(new Vector2(0, -2));
+            if (keyboardState.IsKeyDown(Keys.Down)) camera.Move(new Vector2(0, 2));
+            #endregion
+
+            #region Check for win/loss
 
                 bool[] winloss = winLoseScreen.CheckforWin(Team1, Team2);
             if (winloss[0] || timer < 0) gameScreens = GameScreens.Win;
@@ -294,31 +299,12 @@ namespace Project
 
         protected override void Draw(GameTime gameTime)
         {
-            #region test transform
-            float player;
-            float offsetx;
-            if (Team1.Count > 0 && Team1[0] != null) { 
-                player = MathHelper.Clamp(Team1[0].Position.X, 300, 500);
-                offsetx = 300 - player;
-            }
-            else
-            { 
-                player = MathHelper.Clamp(50, 300, 500);
-                offsetx = 300 - player;
-            }
-            
-            Matrix transform;
-
-            //transform = Matrix.CreateTranslation(offsetx * 0.333f, 0, 0);
-
-            // Matrix combinedTransform = transform * camera.Transform;
-            #endregion
-
             GraphicsDevice.Clear(Color.Black);
 
-            //_spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, null, null, null, Matrix.CreateScale(scale));
-            _spriteBatch.Begin(transformMatrix: camera.Transform);
+            
 
+            //_spriteBatch.Begin(transformMatrix: camera.Transform);
+            _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, camera.Transform);
             #region The win / lose section
             if (gameScreens == GameScreens.Win || gameScreens == GameScreens.Lose)
             {
@@ -342,10 +328,20 @@ namespace Project
                 foreach (Person p in Team1) p.Draw(_spriteBatch, gameTime);
                 foreach (Person p in Team2) p.Draw(_spriteBatch, gameTime);
 
-                _spriteBatch.DrawString(font, $"{Math.Round( timer)} : Seconds to Surivive", new Vector2(310, 50), Color.Black, 0, new Vector2(0, 0), 0.25f, SpriteEffects.None, 0);
+                //_spriteBatch.DrawString(font, $"{Math.Round( timer)} : Seconds to Surivive", new Vector2(camera.Position.X - (80 / camera.Scale), camera.Position.Y- (200 / camera.Scale)), Color.Black, 0, new Vector2(0, 0), 0.5f / camera.Scale, SpriteEffects.None, 0);
+            }
+            
+            _spriteBatch.End();
+
+            _spriteBatch.Begin();
+            if (gameScreens == GameScreens.Running || gameScreens == GameScreens.Pause)
+            {
+                _spriteBatch.DrawString(font, $"{Math.Round(timer)} : Seconds to Surivive", new Vector2(280, 50), Color.Black, 0, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0);
             }
             _spriteBatch.End();
+
             base.Draw(gameTime);
+
         }
     }
 }

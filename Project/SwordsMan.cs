@@ -51,12 +51,12 @@ namespace Project
 
             if (Team == "Team1")
             {
-                Position = new Vector2(50, 328);
+                Position = new Vector2(50, 329);
                 team = 1;
             }
             else if (Team == "Team2") 
             {
-                Position = new Vector2(715, 328);
+                Position = new Vector2(715, 329);
                 team = -1; 
             }
             else throw new Exception($"bad team name: {Team}");
